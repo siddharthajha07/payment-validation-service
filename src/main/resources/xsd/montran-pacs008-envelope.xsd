@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    The Montran envelope for an inbound pacs.008.
+
+    Note where the namespaces sit. In the supplied samples the children are written
+    <env:AppHdr xmlns="...head.001.001.03">, so the AppHdr and FIToFICstmrCdtTrf elements
+    themselves belong to the ENVELOPE namespace; the default xmlns declaration they carry
+    applies to their descendants. That is exactly what this schema expresses: both
+    elements are declared locally here, so they take this schema's target namespace, while
+    their TYPES are imported and carry their own namespaces for the content beneath.
+
+    Getting this backwards is a silent failure rather than a loud one — the parser simply
+    finds no matching element and leaves the header null — which is why it is spelled out.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="urn:montran:message.01"
+           xmlns:head="urn:iso:std:iso:20022:tech:xsd:head.001.001.03"
+           xmlns:pacs="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.12"
+           targetNamespace="urn:montran:message.01"
+           elementFormDefault="qualified">
+
+    <!--
+        The imports carry no schemaLocation on purpose. A schemaLocation is a hint that
+        tells the validator to go and fetch a document, which is precisely the behaviour
+        we disable when hardening against external-entity attacks. Instead the namespace
+        dependency is declared here and all three schema documents are handed to the
+        validator together at startup, so resolution happens entirely in memory from
+        resources we ship and nothing is ever fetched. See XsdValidator.
+    -->
+    <xs:import namespace="urn:iso:std:iso:20022:tech:xsd:head.001.001.03"/>
+    <xs:import namespace="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.12"/>
+
+    <xs:element name="Message">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="AppHdr" type="head:BusinessApplicationHeaderV03"/>
+                <xs:element name="FIToFICstmrCdtTrf"
+                            type="pacs:FIToFICustomerCreditTransferV12"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

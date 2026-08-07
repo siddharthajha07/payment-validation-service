@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    ISO 20022 FI To FI Customer Credit Transfer (pacs.008.001.12) — SUBSET.
+
+    Scope note: this schema enforces STRUCTURE — which elements exist, their order,
+    cardinality and lexical form. It deliberately does not enforce BUSINESS rules such as
+    "the amount must be positive", "the currency must be BBD" or "the transit number must
+    be three digits.
+
+    That separation is intentional. A schema failure means the message could not be
+    understood and yields HTTP 400 with no pacs.002, because a status report cannot
+    reference a message that could not be read. A business-rule failure means the message
+    was understood and rejected, and yields a signed pacs.002 carrying an ISO reason code
+    the sender can act on. Conflating the two would lose that distinction.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.12"
+           targetNamespace="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.12"
+           elementFormDefault="qualified">
+
+    <!-- ============================= Simple types ============================= -->
+
+    <xs:simpleType name="Max35Text">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="35"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Max140Text">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="140"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Max34Text">
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="34"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!-- See the note in head.001.001.03-subset.xsd on why this is relaxed. -->
+    <xs:simpleType name="BicIdentifier">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z0-9]{8,11}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CurrencyCode">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[A-Z]{3}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Max15NumericText">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{1,15}"/>
+        </xs:restriction>
+    </xs:simpleType>
+
+    <!--
+        Amount as a decimal with a required currency attribute. No lower bound is imposed
+        here: "greater than zero" is a business rule, so that a zero or negative amount is
+        rejected with ISO reason code AM01 rather than as a malformed document.
+    -->
+    <xs:complexType name="ActiveCurrencyAndAmount">
+        <xs:simpleContent>
+            <xs:extension base="xs:decimal">
+                <xs:attribute name="Ccy" type="CurrencyCode" use="required"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <!-- ======================= Institutions and accounts ======================= -->
+
+    <xs:complexType name="FinancialInstitutionIdentification">
+        <xs:sequence>
+            <xs:element name="BICFI" type="BicIdentifier"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BranchData">
+        <xs:sequence>
+            <xs:element name="Id" type="Max35Text" minOccurs="0"/>
+            <xs:element name="Nm" type="Max140Text" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="BranchAndFinancialInstitutionIdentification">
+        <xs:sequence>
+            <xs:element name="FinInstnId" type="FinancialInstitutionIdentification"/>
+            <xs:element name="BrnchId" type="BranchData" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="GenericAccountIdentification">
+        <xs:sequence>
+            <xs:element name="Id" type="Max34Text"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AccountIdentification">
+        <xs:choice>
+            <xs:element name="IBAN" type="Max34Text"/>
+            <xs:element name="Othr" type="GenericAccountIdentification"/>
+        </xs:choice>
+    </xs:complexType>
+
+    <xs:complexType name="CashAccount">
+        <xs:sequence>
+            <xs:element name="Id" type="AccountIdentification"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ============================== Parties ================================ -->
+
+    <xs:complexType name="GenericOrganisationIdentification">
+        <xs:sequence>
+            <xs:element name="Id" type="Max35Text"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OrganisationIdentification">
+        <xs:sequence>
+            <xs:element name="Othr" type="GenericOrganisationIdentification"
+                        minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PartyChoice">
+        <xs:sequence>
+            <xs:element name="OrgId" type="OrganisationIdentification"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PartyIdentification">
+        <xs:sequence>
+            <xs:element name="Nm" type="Max140Text" minOccurs="0"/>
+            <xs:element name="Id" type="PartyChoice" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ========================= Payment type details ========================= -->
+
+    <!-- The recurring ISO "code or proprietary" choice, shared by four elements. -->
+    <xs:complexType name="CodeOrProprietary">
+        <xs:sequence>
+            <xs:element name="Cd" type="Max35Text" minOccurs="0"/>
+            <xs:element name="Prtry" type="Max35Text" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PaymentTypeInformation">
+        <xs:sequence>
+            <xs:element name="SvcLvl" type="CodeOrProprietary" minOccurs="0"/>
+            <xs:element name="LclInstrm" type="CodeOrProprietary" minOccurs="0"/>
+            <xs:element name="CtgyPurp" type="CodeOrProprietary" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PaymentIdentification">
+        <xs:sequence>
+            <xs:element name="InstrId" type="Max35Text" minOccurs="0"/>
+            <xs:element name="EndToEndId" type="Max35Text"/>
+            <xs:element name="TxId" type="Max35Text" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SettlementInstruction">
+        <xs:sequence>
+            <xs:element name="SttlmMtd" type="Max35Text"/>
+            <xs:element name="ClrSys" type="CodeOrProprietary" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- ============================ Message body ============================= -->
+
+    <xs:complexType name="GroupHeader">
+        <xs:sequence>
+            <xs:element name="MsgId" type="Max35Text"/>
+            <xs:element name="CreDtTm" type="xs:dateTime"/>
+            <xs:element name="NbOfTxs" type="Max15NumericText"/>
+            <xs:element name="TtlIntrBkSttlmAmt" type="ActiveCurrencyAndAmount" minOccurs="0"/>
+            <xs:element name="IntrBkSttlmDt" type="xs:date" minOccurs="0"/>
+            <xs:element name="SttlmInf" type="SettlementInstruction"/>
+            <xs:element name="InstgAgt" type="BranchAndFinancialInstitutionIdentification"
+                        minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="CreditTransferTransaction">
+        <xs:sequence>
+            <xs:element name="PmtId" type="PaymentIdentification"/>
+            <xs:element name="PmtTpInf" type="PaymentTypeInformation" minOccurs="0"/>
+            <xs:element name="IntrBkSttlmAmt" type="ActiveCurrencyAndAmount"/>
+            <xs:element name="AccptncDtTm" type="xs:dateTime" minOccurs="0"/>
+            <xs:element name="ChrgBr" type="Max35Text" minOccurs="0"/>
+            <xs:element name="UltmtDbtr" type="PartyIdentification" minOccurs="0"/>
+            <xs:element name="Dbtr" type="PartyIdentification"/>
+            <xs:element name="DbtrAcct" type="CashAccount" minOccurs="0"/>
+            <xs:element name="DbtrAgt" type="BranchAndFinancialInstitutionIdentification"/>
+            <xs:element name="CdtrAgt" type="BranchAndFinancialInstitutionIdentification"/>
+            <xs:element name="Cdtr" type="PartyIdentification"/>
+            <xs:element name="CdtrAcct" type="CashAccount" minOccurs="0"/>
+            <xs:element name="UltmtCdtr" type="PartyIdentification" minOccurs="0"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <!-- A pacs.008 is a batch message: one group header, one or more transactions. -->
+    <xs:complexType name="FIToFICustomerCreditTransferV12">
+        <xs:sequence>
+            <xs:element name="GrpHdr" type="GroupHeader"/>
+            <xs:element name="CdtTrfTxInf" type="CreditTransferTransaction"
+                        maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+</xs:schema>
