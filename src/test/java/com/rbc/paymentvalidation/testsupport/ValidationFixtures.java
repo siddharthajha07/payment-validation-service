@@ -82,6 +82,21 @@ public final class ValidationFixtures {
                 + xml.substring(end);
     }
 
+    /**
+     * The conformant message with the ultimate creditor removed.
+     *
+     * <p>The supplied sample carries the same organisation identifier on both ultimate
+     * parties, so both sides resolve to one customer. Removing the creditor side leaves a
+     * message in which exactly one party is identified, which is what tests about customer
+     * naming need in order to assert anything definite.
+     */
+    public static String withoutUltimateCreditor() {
+        String xml = SampleMessages.pacs008ValidAsText();
+        int start = xml.indexOf("<UltmtCdtr>");
+        int end = xml.indexOf("</UltmtCdtr>") + "</UltmtCdtr>".length();
+        return xml.substring(0, start) + xml.substring(end);
+    }
+
     /** @return a context around the conformant message. */
     public static ValidationContext validContext() {
         return contextOf(validMessage());
