@@ -39,3 +39,10 @@ logging:
   level:
     root: INFO
     com.rbc.paymentvalidation: DEBUG
+
+payment:
+  xml:
+    # Upper bound on an inbound payload, checked before parsing so that an oversized body
+    # is never expanded in memory. One megabyte comfortably exceeds a realistic pacs.008
+    # while leaving no room for a resource-exhaustion attempt.
+    max-payload-bytes: 1048576

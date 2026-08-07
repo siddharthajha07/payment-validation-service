@@ -1,0 +1,149 @@
+<env:Message xmlns:env="urn:montran:message.01">
+    <env:AppHdr xmlns="urn:iso:std:iso:20022:tech:xsd:head.001.001.03">
+        <Fr>
+            <FIId>
+                <FinInstnId>
+                    <BICFI>BANKA000</BICFI>
+                </FinInstnId>
+            </FIId>
+        </Fr>
+        <To>
+            <FIId>
+                <FinInstnId>
+                    <BICFI>CBANK0IPS</BICFI>
+                </FinInstnId>
+            </FIId>
+        </To>
+        <BizMsgIdr>MIB621200494113</BizMsgIdr>
+        <MsgDefIdr>pacs.008.001.12</MsgDefIdr>
+        <BizSvc>RTP</BizSvc>
+        <CreDt>2026-07-31T11:57:31Z</CreDt>
+        <Sgntr>
+            <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+                <SignedInfo>
+                    <CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+                    <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+                    <Reference URI="">
+                        <Transforms>
+                            <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                            <Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"/>
+                        </Transforms>
+                        <DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+                        <DigestValue>7XEtlZAMsICO3m4aPDcXebF6Gmw3qhjJuzCKgvdnv+g=</DigestValue>
+                    </Reference>
+                </SignedInfo>
+                <SignatureValue>nDRr7z0bgrJdmidGXbTPT4u79zPt9tdkSh97Bc0JccoZfuZeY8aUZfXg6iAtwtbgEIPnJifgucwc&#13;
+PWqOrPYfZZa/bkK9rrlEU+mFnRxNFUbGdrCioZ4RuzvQGkWHPwmcWzBzUiZiQEEtMUSjmCHRitUf&#13;
+AvSNBEweVACNW2zTPv1sdpb1KLKnx28k3Za+T7iNhAHNMpNRWJ45bjHJ5uoLDDd5dytFtPV5HO4A&#13;
+8R1u0bqdkmKjoFhYixRBQJu5kmAtrOcAizX5rUin62NE38vmkum10JyaUy38kGSBfw/A1dzzKu/+&#13;
+3zwHGydmtkarDBTVqV02y/20xCGJ3aiGgKMX0w==</SignatureValue>
+                <KeyInfo>
+                    <X509Data>
+                        <X509SubjectName>O=Royal Bank of Canada - Banque Royale du Canada,CN=BANKA000-SIGNING</X509SubjectName>
+                        <X509IssuerSerial>
+                            <X509IssuerName>CN=CBB Test Client Auth CA</X509IssuerName>
+                            <X509SerialNumber>69516885613622023115907863831999103173813571463</X509SerialNumber>
+                        </X509IssuerSerial>
+                    </X509Data>
+                </KeyInfo>
+            </Signature>
+        </Sgntr>
+    </env:AppHdr>
+    <env:FIToFICstmrCdtTrf xmlns="urn:iso:std:iso:20022:tech:xsd:pacs.008.001.12">
+        <GrpHdr>
+            <MsgId>MIB621200494113</MsgId>
+            <CreDtTm>2026-07-31T07:57:31</CreDtTm>
+            <NbOfTxs>1</NbOfTxs>
+            <TtlIntrBkSttlmAmt Ccy="BBD">1.02</TtlIntrBkSttlmAmt>
+            <IntrBkSttlmDt>2026-07-31</IntrBkSttlmDt>
+            <SttlmInf>
+                <SttlmMtd>CLRG</SttlmMtd>
+                <ClrSys>
+                    <Prtry>SENT</Prtry>
+                </ClrSys>
+            </SttlmInf>
+            <InstgAgt>
+                <FinInstnId>
+                    <BICFI>BANKA000</BICFI>
+                </FinInstnId>
+            </InstgAgt>
+        </GrpHdr>
+        <CdtTrfTxInf>
+            <PmtId>
+                <InstrId>B621200494113</InstrId>
+                <EndToEndId>EEB621200494113</EndToEndId>
+                <TxId>B621200494113</TxId>
+            </PmtId>
+            <PmtTpInf>
+                <SvcLvl>
+                    <Prtry>SENT</Prtry>
+                </SvcLvl>
+                <LclInstrm>
+                    <Cd>INST</Cd>
+                </LclInstrm>
+                <CtgyPurp>
+                    <Cd>SA</Cd>
+                </CtgyPurp>
+            </PmtTpInf>
+            <IntrBkSttlmAmt Ccy="BBD">1.02</IntrBkSttlmAmt>
+            <AccptncDtTm>2026-07-31T07:57:31</AccptncDtTm>
+            <ChrgBr>SLEV</ChrgBr>
+            <UltmtDbtr>
+                <Nm>PYRAMID ENT MAN INC</Nm>
+                <Id>
+                    <OrgId>
+                        <Othr>
+                            <Id>6075857</Id>
+                        </Othr>
+                    </OrgId>
+                </Id>
+            </UltmtDbtr>
+            <Dbtr>
+                <Nm>PYRAMID ENT MAN INC</Nm>
+            </Dbtr>
+            <DbtrAcct>
+                <Id>
+                    <Othr>
+                        <Id>2003135</Id>
+                    </Othr>
+                </Id>
+            </DbtrAcct>
+            <DbtrAgt>
+                <FinInstnId>
+                    <BICFI>BANKA000</BICFI>
+                </FinInstnId>
+                <BrnchId>
+                    <Id>05605</Id>
+                </BrnchId>
+            </DbtrAgt>
+            <CdtrAgt>
+                <FinInstnId>
+                    <BICFI>BANKB000</BICFI>
+                </FinInstnId>
+                <BrnchId>
+                    <Id>09606</Id>
+                </BrnchId>
+            </CdtrAgt>
+            <Cdtr>
+                <Nm>test</Nm>
+            </Cdtr>
+            <CdtrAcct>
+                <Id>
+                    <Othr>
+                        <Id>1000331148</Id>
+                    </Othr>
+                </Id>
+            </CdtrAcct>
+            <UltmtCdtr>
+                <Nm>test</Nm>
+                <Id>
+                    <OrgId>
+                        <Othr>
+                            <Id>6075857</Id>
+                        </Othr>
+                    </OrgId>
+                </Id>
+            </UltmtCdtr>
+        </CdtTrfTxInf>
+    </env:FIToFICstmrCdtTrf>
+</env:Message>
