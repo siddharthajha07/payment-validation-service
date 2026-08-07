@@ -1,0 +1,25 @@
+# Maven build output
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Local runtime data (H2 file-mode databases, if ever enabled)
+*.db
+*.mv.db
+*.trace.db
