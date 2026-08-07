@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: payment-validation-service
+
+  datasource:
+    # In-memory H2. DB_CLOSE_DELAY=-1 keeps the database alive for the lifetime of
+    # the JVM rather than dropping it when the last connection closes.
+    url: jdbc:h2:mem:paymentdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      # The schema is created from the entity definitions at startup. Acceptable for an
+      # embedded database; a production deployment would use versioned migrations
+      # (Flyway or Liquibase) so the schema is reviewable and repeatable.
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  h2:
+    console:
+      # Browsable at http://localhost:8080/h2-console for demonstration and troubleshooting.
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8080
+  error:
+    # Never expose stack traces or internal messages to callers; the global exception
+    # handler returns a controlled error document instead.
+    include-message: never
+    include-stacktrace: never
+
+logging:
+  level:
+    root: INFO
+    com.rbc.paymentvalidation: DEBUG
