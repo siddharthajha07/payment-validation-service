@@ -60,3 +60,12 @@ payment:
     transit-number-length: 3
     # How far ahead a settlement date may be dated.
     max-future-settlement-days: 2
+
+  signing:
+    # A self-signed, test-only key pair, committed so the service runs straight from a
+    # clone. Production would hold the private key in an HSM or a secrets manager and use
+    # a certificate issued by a CA the counterparty trusts. See ASSUMPTIONS.md.
+    keystore-location: keystore/signing-keystore.p12
+    keystore-password: changeit
+    key-alias: payment-signing
+    key-password: changeit

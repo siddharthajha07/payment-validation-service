@@ -82,9 +82,13 @@ public class SecureXmlParser {
         try {
             DocumentBuilder builder = hardenedFactory().newDocumentBuilder();
             builder.setErrorHandler(new FailFastErrorHandler());
-            Document document = builder.parse(new ByteArrayInputStream(payload));
-            document.normalizeDocument();
-            return document;
+            // The parsed document is returned exactly as it was read. In particular it is
+            // NOT normalised: Document.normalizeDocument() merges text nodes and performs
+            // namespace fixup, both of which change the canonical byte form of the
+            // document. A digital signature is computed over exactly those bytes, so
+            // normalising a signed message silently makes its signature stop verifying
+            // while leaving the XML looking entirely correct.
+            return builder.parse(new ByteArrayInputStream(payload));
         } catch (ParserConfigurationException e) {
             throw new XmlProcessingException("XML parser could not be configured securely", e);
         } catch (SAXException | IOException e) {

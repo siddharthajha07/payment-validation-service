@@ -1,32 +1,26 @@
-package com.rbc.paymentvalidation.xml.model.header;
+package com.rbc.paymentvalidation.xml.model.pacs002;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlType;
 
-/**
- * {@code FIId} — wraps the financial institution identification inside a header party.
- */
+/** An agent referenced by the status report, such as {@code InstdAgt}. */
 @XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(propOrder = {"financialInstitutionIdentification"})
 public class BranchAndFinancialInstitutionIdentification {
 
     @XmlElement(name = "FinInstnId")
     private FinancialInstitutionIdentification financialInstitutionIdentification;
 
-    /** Required by JAXB when reading an inbound message. */
-    public BranchAndFinancialInstitutionIdentification() {
+    protected BranchAndFinancialInstitutionIdentification() {
     }
 
-    /** Convenience for building an outbound header. */
     public BranchAndFinancialInstitutionIdentification(String bic) {
         this.financialInstitutionIdentification = new FinancialInstitutionIdentification(bic);
     }
 
     public FinancialInstitutionIdentification getFinancialInstitutionIdentification() {
         return financialInstitutionIdentification;
-    }
-
-    public void setFinancialInstitutionIdentification(FinancialInstitutionIdentification value) {
-        this.financialInstitutionIdentification = value;
     }
 }

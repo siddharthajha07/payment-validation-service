@@ -18,6 +18,15 @@ public class HeaderParty {
     @XmlElement(name = "FIId")
     private BranchAndFinancialInstitutionIdentification financialInstitution;
 
+    /** Required by JAXB when reading an inbound message. */
+    public HeaderParty() {
+    }
+
+    /** Convenience for building an outbound header. */
+    public HeaderParty(String bic) {
+        this.financialInstitution = new BranchAndFinancialInstitutionIdentification(bic);
+    }
+
     public BranchAndFinancialInstitutionIdentification getFinancialInstitution() {
         return financialInstitution;
     }
