@@ -7,17 +7,12 @@ import jakarta.xml.bind.annotation.XmlValue;
 import java.math.BigDecimal;
 
 /**
- * A monetary amount with its currency, for example
- * {@code <IntrBkSttlmAmt Ccy="BBD">1.02</IntrBkSttlmAmt>}.
+ * A monetary amount with its currency, such as IntrBkSttlmAmt Ccy="BBD" of 1.02.
  *
- * <p>The amount is a {@link BigDecimal}, never a {@code double}. Binary floating point
- * cannot represent decimal fractions such as {@code 1.02} exactly, so {@code double}
- * accumulates error under arithmetic and comparison. {@code BigDecimal} also preserves
- * the scale as written, which is what allows the "at most two decimal places" rule to be
- * checked against what the sender actually sent.
- *
- * <p>{@code @XmlValue} binds the element's text content; {@code @XmlAttribute} binds the
- * {@code Ccy} attribute alongside it.
+ * BigDecimal, never double. Binary floating point cannot represent 1.02 exactly, so double
+ * accumulates error under arithmetic and comparison. BigDecimal is exact and preserves the
+ * scale as written, which is what lets the at-most-two-decimal-places rule be checked against
+ * what the sender actually sent.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class ActiveCurrencyAndAmount {

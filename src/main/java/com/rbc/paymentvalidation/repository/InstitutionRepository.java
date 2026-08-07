@@ -4,7 +4,12 @@ import com.rbc.paymentvalidation.domain.Institution;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-/** Lookup of participating institutions, used by the validators to resolve a BIC. */
+/**
+ * Lookup of participating institutions, used by the validators to resolve a BIC.
+ *
+ * A suspended participant is inactive rather than deleted so historical payments still
+ * resolve, which is why validation has to ask for an active one.
+ */
 public interface InstitutionRepository extends JpaRepository<Institution, Long> {
 
     Optional<Institution> findByBic(String bic);

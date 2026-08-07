@@ -15,7 +15,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 /**
  * Tests that the audit trail is genuinely append-only.
  *
- * <p>Two of these tests exist to prove claims that would otherwise be only comments: that
+ * Two of these tests exist to prove claims that would otherwise be only comments: that
  * no operation exists to erase an event, and that an attempt to modify one has no effect
  * on what is stored.
  */

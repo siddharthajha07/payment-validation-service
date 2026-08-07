@@ -12,26 +12,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Recognises requests that have already been answered, and answers them the same way.
+ * Recognises requests already answered, and answers them the same way.
  *
- * <h2>The problem this solves</h2>
- * A client sends a payment, the connection drops before the response arrives, and the
- * client has no way to know whether the payment was processed. Its only safe options are
- * to retry and risk paying twice, or not to retry and risk not paying at all. An
- * idempotency key removes the dilemma: the client retries with the same key and gets the
- * original answer back.
+ * A client whose connection dropped cannot know whether its payment was processed, and an
+ * idempotency key removes the dilemma. The stored response is replayed rather than
+ * regenerated, because a fresh one would carry a new timestamp and therefore a new signature.
  *
- * <h2>Why the stored response is replayed rather than regenerated</h2>
- * The response carries a digital signature over its exact bytes, and a regenerated report
- * would have a new identifier and timestamp and therefore a different signature. A client
- * comparing the two would see two different documents for one payment. Storing the
- * response makes a replay genuinely identical.
- *
- * <h2>Why the request is hashed</h2>
- * The hash distinguishes an honest retry from a key reused by mistake with different
- * content. The first is replayed; the second is refused, because replaying it would return
- * a status report about a different payment. Hashing rather than storing the body also
- * keeps customer names and account numbers out of this table.
+ * The request is hashed to tell an honest retry from a key reused with different content. That
+ * also keeps names and account numbers out of this table.
  */
 @Service
 public class IdempotencyService {
@@ -44,10 +32,6 @@ public class IdempotencyService {
         this.idempotencyRecordRepository = idempotencyRecordRepository;
     }
 
-    /**
-     * @param payload the raw request body
-     * @return the SHA-256 of the body, hex encoded
-     */
     public String hash(byte[] payload) {
         try {
             return HexFormat.of().formatHex(

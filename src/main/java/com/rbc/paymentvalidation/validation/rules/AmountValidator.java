@@ -17,20 +17,13 @@ import org.springframework.stereotype.Component;
 /**
  * Checks the settlement amount and currency of every transaction.
  *
- * <h2>Three separate faults, three separate codes</h2>
- * A zero amount, a negative amount and an over-precise amount are different mistakes and
- * receive different ISO codes ({@code AM01}, {@code AM02}, {@code AM02} respectively), so
- * that the sender's software can tell them apart without reading English text.
+ * Zero, negative and over-precise amounts are three different mistakes and get three different
+ * ISO codes, so the sender's software can tell them apart without reading English.
  *
- * <h2>Why precision is checked at all</h2>
- * The schema permits any decimal. A payment for 1.005 in a currency with two decimal
- * places cannot be settled: someone downstream would have to round it, and rounding
- * someone else's money silently is exactly the sort of thing that must not happen. Better
- * to reject it and have the sender state what they meant.
- *
- * <p>Trailing zeros are normalised away before the check, so {@code 1.020} is treated as
- * two decimal places rather than three. A trailing zero adds no precision and rejecting it
- * would be pedantry rather than protection.
+ * Precision is checked because the schema allows any decimal. A payment of 1.005 in a
+ * two-decimal currency cannot be settled without someone rounding it, and rounding another
+ * party's money quietly is exactly what must not happen. Trailing zeros are stripped first,
+ * since 1.020 carries no more precision than 1.02.
  */
 @Component
 @Order(50)

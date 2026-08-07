@@ -1,16 +1,12 @@
 package com.rbc.paymentvalidation.validation;
 
 /**
- * A single reason a payment was rejected.
+ * One reason a payment was rejected.
  *
- * @param reasonCode the ISO code reported to the sender in the pacs.002
- * @param message    what went wrong, in terms of the rule rather than the data. This text
- *                   reaches logs, the audit trail and the response, so it must never
- *                   contain a customer name, an account number or any payload content.
- * @param location   where in the message the fault lies, as an element path such as
- *                   {@code CdtTrfTxInf[0]/DbtrAcct}. Element paths are structural and
- *                   carry no customer data, so they are safe to return and genuinely
- *                   useful to whoever has to repair the message.
+ * The message describes the rule rather than the data, because it reaches logs, the audit
+ * trail and the response. The location is an element path such as CdtTrfTxInf[0]/DbtrAcct,
+ * which is structural and carries no customer data, so it is safe to return and genuinely
+ * useful to whoever has to repair the message.
  */
 public record ValidationError(RejectReasonCode reasonCode, String message, String location) {
 

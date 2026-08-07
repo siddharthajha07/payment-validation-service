@@ -3,15 +3,9 @@ package com.rbc.paymentvalidation.validation;
 /**
  * ISO 20022 External Status Reason codes used when rejecting a payment.
  *
- * <p>These are published ISO codes rather than codes invented for this service. That
- * matters: the pacs.002 carrying one is read by another bank's software, which matches on
- * the code to decide what to do next — retry, repair and resend, or refer to the customer.
- * A private code would be meaningless to the receiver and would have to be handled by a
- * human.
- *
- * <p>The description accompanies the code in the audit trail and in the response's
- * additional information, so an operator reading a rejection does not have to look the
- * code up.
+ * These are published codes, not ones invented here. The pacs.002 carrying one is read by
+ * another bank's software, which matches on the code to decide whether to repair and resend,
+ * retry, or refer to its customer. A private code would mean nothing to it.
  */
 public enum RejectReasonCode {
 

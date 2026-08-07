@@ -13,18 +13,15 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Confirms that every institution named on the message is one this service recognises and
- * that is currently permitted to participate.
+ * Checks that every institution named on the message is one we recognise and that is allowed
+ * to participate right now.
  *
- * <h2>Why "active" and not merely "known"</h2>
- * A suspended participant is marked inactive rather than deleted, so that historical
- * payments continue to reference a row that still exists. It follows that recognising a
- * BIC is not sufficient — the institution must also be active right now. Looking up only
- * by BIC would happily accept traffic from a participant that has been suspended.
+ * Active matters as much as known. A suspended participant is flagged rather than deleted so
+ * historical payments still resolve, which means looking up by BIC alone would happily accept
+ * traffic from a participant that has been suspended.
  *
- * <p>Running before the account rules is deliberate: those rules ask an institution what
- * account prefix it uses, and that question only has an answer once the institution is
- * known to exist.
+ * It runs before the account rules because those ask an institution what prefix it uses, and
+ * that only has an answer once the institution is known to exist.
  */
 @Component
 @Order(30)

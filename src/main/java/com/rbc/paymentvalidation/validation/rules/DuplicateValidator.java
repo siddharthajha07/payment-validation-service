@@ -17,31 +17,17 @@ import org.springframework.stereotype.Component;
 /**
  * Rejects a payment whose transaction identifier has already been processed.
  *
- * <h2>How this differs from the idempotency key</h2>
- * These are two different protections against two different mistakes, and the distinction
- * is worth being precise about.
+ * This is not the same thing as the idempotency key. That handles the transport problem: a
+ * client that never saw a response retries, and should get the original answer replayed. This
+ * handles the business problem: a genuinely new request carrying a transaction that has been
+ * settled before, which is a defect at the sender and would move money twice.
  *
- * <p>The {@code X-Idempotency-Key} header handles the <em>transport</em> problem: a client
- * did not receive a response, cannot know whether the request arrived, and retries. That
- * caller should receive the original answer replayed, not a rejection — nothing has gone
- * wrong.
+ * Identifiers are also checked against each other, since a batch can repeat one internally and
+ * that never reaches the database.
  *
- * <p>This rule handles the <em>business</em> problem: a genuinely new request, with its own
- * idempotency key, carrying a transaction identifier that has been settled before. That is
- * a defect at the sender and must be rejected, because paying it twice would move money
- * twice.
- *
- * <h2>Why the check inside the message matters too</h2>
- * A single batch can repeat an identifier within itself. That never reaches the database,
- * so a repository query alone would not see it; the identifiers are therefore also checked
- * against each other.
- *
- * <h2>Why this is not the last line of defence</h2>
- * This rule reads and then the service writes, and between those two moments a concurrent
- * request may insert the same identifier. The unique constraint on {@code payment.
- * transaction_id} is what makes duplicate detection actually reliable. This rule exists to
- * turn the common case into a courteous ISO rejection instead of a constraint violation;
- * it does not replace the constraint.
+ * It is not the last line of defence. This reads and then the service writes, and a concurrent
+ * request can insert in between. The unique constraint on payment.transaction_id is what makes
+ * duplicate detection reliable; this rule just turns the common case into a polite rejection.
  */
 @Component
 @Order(80)

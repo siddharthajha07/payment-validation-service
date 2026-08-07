@@ -33,14 +33,14 @@ public class BranchAndFinancialInstitutionIdentification {
         this.branch = branch;
     }
 
-    /** @return this agent's BIC, or {@code null} if absent. */
+    /** @return this agent's BIC, or null if absent. */
     public String bic() {
         return financialInstitutionIdentification == null
                 ? null
                 : financialInstitutionIdentification.getBicfi();
     }
 
-    /** @return this agent's branch (transit) identifier, or {@code null} if absent. */
+    /** @return this agent's branch (transit) identifier, or null if absent. */
     public String transitNumber() {
         return branch == null ? null : branch.getId();
     }

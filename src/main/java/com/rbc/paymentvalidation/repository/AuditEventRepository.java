@@ -7,15 +7,13 @@ import org.springframework.data.repository.Repository;
 /**
  * Append-only access to the audit trail.
  *
- * <h2>Why this extends Repository and not JpaRepository</h2>
- * {@code Repository} is a marker interface that declares no methods at all, so this
- * interface has exactly the operations written below and nothing more. Extending
- * {@code JpaRepository} instead would inherit {@code delete}, {@code deleteAll},
- * {@code deleteAllInBatch} and the rest, putting the means to erase the audit trail one
+ * This extends Repository, a marker interface with no methods, rather than JpaRepository. That
+ * means it has exactly the operations written below. Extending JpaRepository would inherit
+ * delete, deleteAll and deleteAllInBatch, putting the means to erase the audit trail one
  * autocomplete away from any future contributor.
  *
- * <p>Restricting the interface is a design decision rather than a technical necessity —
- * which is the point. The trail is meant to be append-only, so the type system says so.
+ * Restricting the interface is a design decision rather than a technical necessity, which is
+ * rather the point.
  */
 public interface AuditEventRepository extends Repository<AuditEvent, Long> {
 

@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * {@code BrnchId} — the branch of an agent. Its {@code Id} carries the transit number
+ * BrnchId — the branch of an agent. Its Id carries the transit number
  * that the institution/account compatibility rule checks.
  */
 @XmlAccessorType(XmlAccessType.FIELD)

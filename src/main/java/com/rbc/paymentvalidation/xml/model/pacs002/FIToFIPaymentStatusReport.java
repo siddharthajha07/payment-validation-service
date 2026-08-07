@@ -7,14 +7,7 @@ import jakarta.xml.bind.annotation.XmlType;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * {@code FIToFIPmtStsRpt} — the pacs.002 document.
- *
- * <p>Statuses are reported at two levels, matching the supplied samples. The group status
- * reports the fate of the message as a whole; the transaction statuses report individual
- * outcomes. This service decides the whole message at once, so a rejection carries a group
- * status and no transaction entries, while an acceptance carries both.
- */
+/** FIToFIPmtStsRpt — the pacs.002 document. */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"groupHeader", "originalGroupInformationAndStatus",
         "transactionInformationAndStatus"})

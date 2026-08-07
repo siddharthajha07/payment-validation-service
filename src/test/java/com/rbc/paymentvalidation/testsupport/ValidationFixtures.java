@@ -14,7 +14,7 @@ import java.time.ZoneOffset;
 /**
  * Shared building blocks for the validation tests.
  *
- * <p>Tests start from a real, parsed message and mutate the one value under test. Building
+ * Tests start from a real, parsed message and mutate the one value under test. Building
  * message objects field by field would be quicker to write but would prove less: a test
  * that constructs exactly the shape it expects cannot discover that the real message has a
  * different shape.
@@ -24,7 +24,7 @@ public final class ValidationFixtures {
     /**
      * A fixed point in time, one day before the settlement date carried by the sample.
      *
-     * <p>Every date-sensitive test uses this rather than the real clock. The sample settles
+     * Every date-sensitive test uses this rather than the real clock. The sample settles
      * on 2026-07-31; anchoring "today" at 2026-07-30 makes that date exactly one day ahead,
      * so it sits inside the two-day window — and will still sit inside it whenever these
      * tests are run, which would not be true of a test written against the real clock.
@@ -70,7 +70,7 @@ public final class ValidationFixtures {
     /**
      * The conformant message with its single transaction repeated verbatim.
      *
-     * <p>Used to prove that a transaction identifier repeated inside one batch is caught.
+     * Used to prove that a transaction identifier repeated inside one batch is caught.
      * Such a repeat never reaches the database, so a repository query alone cannot see it.
      */
     public static String duplicatedTransactionMessage() {
@@ -85,7 +85,7 @@ public final class ValidationFixtures {
     /**
      * The conformant message with the ultimate creditor removed.
      *
-     * <p>The supplied sample carries the same organisation identifier on both ultimate
+     * The supplied sample carries the same organisation identifier on both ultimate
      * parties, so both sides resolve to one customer. Removing the creditor side leaves a
      * message in which exactly one party is identified, which is what tests about customer
      * naming need in order to assert anything definite.

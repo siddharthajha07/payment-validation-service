@@ -14,8 +14,8 @@ import org.w3c.dom.Element;
 /**
  * Tests for the enveloped XML digital signature.
  *
- * <p>The important tests here are the last two. Proving a signature is <em>present</em>
- * proves very little; proving it <em>verifies</em>, and that it stops verifying once the
+ * The important tests here are the last two. Proving a signature is present
+ * proves very little; proving it verifies, and that it stops verifying once the
  * document is altered, is what shows the signature actually protects anything.
  */
 class XmlSignatureServiceTest {

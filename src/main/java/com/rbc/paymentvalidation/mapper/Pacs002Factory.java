@@ -20,20 +20,14 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
- * Builds the pacs.002 status report returned for an incoming pacs.008.
+ * Builds the pacs.002 returned for an incoming pacs.008.
  *
- * <h2>The header is answered, not copied</h2>
- * The response reverses the parties: its {@code Fr} is the request's {@code To} and its
- * {@code To} is the request's {@code Fr}. This service is replying as the institution the
- * payment was addressed to, and getting this backwards would produce a message that
- * appears to come from the sender itself.
+ * The header is answered, not copied: the response Fr is the request To and vice versa, since
+ * we reply as the institution the payment was addressed to.
  *
- * <h2>Accepted and rejected reports differ in shape</h2>
- * A rejection carries a group status of {@code RJCT} with the reason, and no transaction
- * entries: the message was refused as a whole, so there is no per-transaction outcome to
- * report. An acceptance carries {@code ACCP} together with one entry per transaction,
- * echoing all three original identifiers so that every party in the chain can match the
- * report to its own record. Both shapes follow the supplied samples.
+ * A rejection carries RJCT with a reason and no transaction entries, because the message was
+ * refused as a whole. An acceptance carries ACCP plus one entry per transaction, echoing all
+ * three original identifiers so every party in the chain can match it to their own record.
  */
 @Component
 public class Pacs002Factory {
@@ -55,7 +49,7 @@ public class Pacs002Factory {
         this.clock = clock;
     }
 
-    /** Builds an {@code ACCP} report for a message that passed every rule. */
+    /** Builds an ACCP report for a message that passed every rule. */
     public Pacs002Message accept(Pacs008Message request) {
         String statusMessageId = generateMessageIdentifier();
         String timestamp = timestamp();
@@ -74,7 +68,7 @@ public class Pacs002Factory {
                         transactionStatuses));
     }
 
-    /** Builds an {@code RJCT} report carrying the ISO reason code for the failure. */
+    /** Builds an RJCT report carrying the ISO reason code for the failure. */
     public Pacs002Message reject(Pacs008Message request, ValidationError error) {
         String statusMessageId = generateMessageIdentifier();
         String timestamp = timestamp();
@@ -133,7 +127,7 @@ public class Pacs002Factory {
 
     /**
      * @return a unique identifier for this status report, in the shape used by the supplied
-     *         samples: a {@code PS} prefix, the date, and a random suffix. Random rather
+     *         samples: a PS prefix, the date, and a random suffix. Random rather
      *         than sequential because a sequence would need coordinated state across
      *         instances and would leak the service's message volume to anyone receiving two
      *         of them.

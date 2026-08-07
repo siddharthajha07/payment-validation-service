@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * {@code Id} of a cash account — in ISO 20022 a choice between an IBAN and any other
+ * Id of a cash account — in ISO 20022 a choice between an IBAN and any other
  * scheme. Both are modelled; the validators decide which is acceptable.
  */
 @XmlAccessorType(XmlAccessType.FIELD)

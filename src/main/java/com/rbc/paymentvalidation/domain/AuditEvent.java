@@ -14,32 +14,13 @@ import java.time.Instant;
 /**
  * One entry on the append-only audit trail.
  *
- * <h2>How immutability is enforced, and where it stops</h2>
- * Three mechanisms, in increasing order of strength:
- * <ol>
- *   <li>The class exposes no setters, so application code has no way to change an event
- *       once it is constructed.</li>
- *   <li>Every column is mapped {@code updatable = false}, so even a mutated managed
- *       instance produces no {@code UPDATE} — Hibernate omits those columns entirely.</li>
- *   <li>{@code AuditEventRepository} declares only {@code save} and finders, so no
- *       deletion or bulk modification operation is reachable from the application.</li>
- * </ol>
- * None of this protects against someone issuing {@code UPDATE audit_event} directly
- * against the database. Genuine tamper-evidence needs controls this application cannot
- * provide alone: revoking {@code UPDATE} and {@code DELETE} from the service's database
- * role, an append-only store, or hash-chaining each row to its predecessor. That is
- * recorded as a documented limit rather than left implied.
+ * Immutability is enforced three ways: no setters, every column updatable = false, and a
+ * repository declaring only save and finders. None of that stops someone running UPDATE
+ * audit_event directly; real tamper-evidence needs revoked database grants, an append-only
+ * store, or hash-chaining. Recorded as a known limit.
  *
- * <h2>Why the payment reference is a plain column</h2>
- * {@code paymentId} is a bare {@code Long}, not a JPA association. Events are recorded
- * from the moment a request arrives, which is before any payment row exists, and a
- * foreign key would either block those early writes or force the trail to start late.
- * The audit trail must be able to record what happened even when nothing else could be
- * written — including the case where processing failed before a payment was ever created.
- *
- * <h2>What may be written to detail</h2>
- * {@code detail} describes the decision, never the data behind it: which rule rejected the
- * message, not the customer's name, account number, or the payload.
+ * paymentId is a plain column, not an association, because events are recorded before any
+ * payment row exists and the trail has to work even when nothing else could be written.
  */
 @Entity
 @Table(name = "audit_event",

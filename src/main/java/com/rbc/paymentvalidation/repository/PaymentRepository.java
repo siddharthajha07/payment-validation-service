@@ -10,14 +10,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 /**
  * Transaction lookup and reconciliation.
  *
- * <p>Each finder here answers a question someone actually asks:
- * <ul>
- *   <li>by transaction id — duplicate detection, and "what happened to this payment?"</li>
- *   <li>by end-to-end id — the originating customer's own reference, which is what they
- *       quote when they call to ask about a payment</li>
- *   <li>by settlement date and status — the daily reconciliation view</li>
- *   <li>by correlation id — troubleshooting one specific request end to end</li>
- * </ul>
+ * Each finder answers a question someone actually asks: by transaction id for duplicate
+ * detection and what happened to this payment, by end-to-end id because that is the reference
+ * the originating customer quotes when they call, by settlement date and status for the daily
+ * reconciliation view, and by correlation id when troubleshooting one request.
  */
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 

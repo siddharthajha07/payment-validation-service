@@ -12,7 +12,7 @@ import org.w3c.dom.Document;
 /**
  * Tests for schema validation.
  *
- * <p>Each negative case mutates the supplied sample rather than constructing an artificial
+ * Each negative case mutates the supplied sample rather than constructing an artificial
  * document, so what is proved is that a realistic message with one specific fault is
  * caught — not merely that some unrelated invalid document fails.
  */

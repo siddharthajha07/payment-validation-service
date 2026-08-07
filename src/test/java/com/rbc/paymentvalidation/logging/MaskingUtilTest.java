@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for the masking rules.
  *
- * <p>These exist to make a stated intention enforceable. "We do not log account numbers" is
+ * These exist to make a stated intention enforceable. "We do not log account numbers" is
  * a claim until something fails when the claim stops being true.
  */
 class MaskingUtilTest {

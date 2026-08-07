@@ -4,18 +4,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
-/**
- * {@code GrpHdr} — information common to every transaction in the message.
- *
- * <p>{@code numberOfTransactions} and {@code totalInterbankSettlementAmount} are control
- * totals: the sender states how many transactions and what value the message contains,
- * and the receiver checks those claims against what actually arrived. Mismatches indicate
- * truncation or tampering, which is why both are validated rather than merely stored.
- *
- * <p>Date and time fields are {@code String} here. The XSD constrains them to valid
- * {@code xs:date} and {@code xs:dateTime} forms, and conversion to Java date types
- * happens in the mapper, where a failure can be reported as a business error.
- */
+/** GrpHdr — information common to every transaction in the message. */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class GroupHeader {
 

@@ -1,13 +1,11 @@
 package com.rbc.paymentvalidation.service;
 
 /**
- * Raised when an idempotency key is reused with a different payload.
+ * An idempotency key was reused with a different payload.
  *
- * <p>This is the dangerous case, and the reason the request is hashed rather than merely
- * counted. A caller that reuses a key by mistake must be told: replaying the first
- * response would hand them a status report about somebody else's payment, and processing
- * the request afresh would defeat the purpose of the key entirely. Refusing is the only
- * safe answer.
+ * This is why the request is hashed rather than just counted. Replaying would hand the caller
+ * a status report about somebody else's payment, and processing afresh would defeat the key
+ * entirely. Refusing is the only safe answer.
  */
 public class IdempotencyConflictException extends RuntimeException {
 

@@ -13,24 +13,17 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.Instant;
 
 /**
- * An account held at an institution, learned from the payments that reference it.
+ * An account at an institution, learned from the payments that reference it.
  *
- * <h2>Why the unique key spans two columns</h2>
- * The constraint is on {@code (account_number, institution_id)}, not on the account
- * number alone. Two institutions can legitimately issue the same account number; they are
- * different accounts, and a single-column constraint would refuse the second one and
- * conflate two unrelated customers.
+ * The unique key spans number and institution, not the number alone: two institutions can
+ * issue the same number and they are different accounts.
  *
- * <h2>Why the customer link is optional</h2>
- * A payment always names an account but does not always carry an organisation identifier
- * for the party holding it — in the supplied sample the debtor has a name but no
- * identifier, while the ultimate debtor has both. Requiring a customer would mean either
- * rejecting a valid message or inventing a customer record with no reference, so the
- * association is nullable and populated when the message supplies enough to do so.
+ * The customer link is optional because a payment always names an account but does not always
+ * carry an identifier for the party holding it. Requiring one would mean rejecting valid
+ * messages or inventing customer records with no key.
  *
- * <p>Associations are lazily fetched. With {@code open-in-view} disabled, that forces
- * callers to load what they need inside a transaction rather than triggering unplanned
- * queries while a response is being written.
+ * Associations are lazy. With open-in-view off, that forces callers to load what they need
+ * inside a transaction rather than triggering queries while the response is being written.
  */
 @Entity
 @Table(name = "account",
@@ -46,7 +39,7 @@ public class Account {
     @Column(name = "account_number", nullable = false, length = 34)
     private String accountNumber;
 
-    /** Branch identifier carried as {@code BrnchId/Id} on the agent. */
+    /** Branch identifier carried as BrnchId/Id on the agent. */
     @Column(name = "transit_number", length = 35)
     private String transitNumber;
 

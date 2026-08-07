@@ -4,9 +4,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
-/**
- * {@code FIId} — wraps the financial institution identification inside a header party.
- */
+/** FIId — wraps the financial institution identification inside a header party. */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class BranchAndFinancialInstitutionIdentification {
 

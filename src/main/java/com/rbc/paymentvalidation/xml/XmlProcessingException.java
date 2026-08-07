@@ -1,14 +1,12 @@
 package com.rbc.paymentvalidation.xml;
 
 /**
- * Raised when an inbound payload cannot be read as XML at all — it is empty, oversized,
- * not well formed, or contains constructs the hardened parser refuses.
+ * The payload could not be read as XML at all: empty, oversized, malformed, or carrying a
+ * DOCTYPE.
  *
- * <p>This is distinct from a business rejection. A message that cannot be parsed cannot
- * be answered with a pacs.002, because a status report has to quote the identifiers of
- * the message it refers to and those identifiers could not be read. The global exception
- * handler therefore maps this to HTTP 400 with a plain error document, whereas a message
- * that parses but breaks a business rule receives a signed pacs.002 rejection.
+ * This is not a business rejection. A message that cannot be parsed cannot be answered with a
+ * pacs.002, because a status report has to quote identifiers that were never read. The global
+ * handler maps this to 400 with a plain error document instead.
  */
 public class XmlProcessingException extends RuntimeException {
 

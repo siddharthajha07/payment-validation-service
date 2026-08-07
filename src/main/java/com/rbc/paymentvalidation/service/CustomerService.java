@@ -12,29 +12,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 /**
- * Creates and updates customer and account records from the parties named on a payment.
+ * Creates and updates customers and accounts from the parties named on a payment.
  *
- * <h2>Learning customers from traffic</h2>
- * This service has no customer onboarding process; it learns about customers from the
- * payments that reference them. The first message naming a party creates the record, and
- * later messages refine it. That is the behaviour the assessment asks for, and it is how
- * a clearing participant's shadow customer store typically works.
+ * Customers are learned from traffic: the first message naming a party creates the record and
+ * later ones refine it. Only accepted payments change customer data, since treating a message
+ * we just declared invalid as truth about a customer is the easiest way to corrupt the store.
  *
- * <h2>Only accepted payments change customer data</h2>
- * A rejected payment updates nothing. Its data failed validation, so treating it as a
- * source of truth about a customer would let a malformed or fraudulent message rewrite
- * legitimate records — the easiest way to corrupt a customer store is to learn from
- * messages you have just declared invalid.
- *
- * <h2>Concurrent first sighting</h2>
- * Two payments naming the same previously unknown customer can be processed at once. Both
- * find nothing, both insert, and the unique constraint on the customer reference rejects
- * the second. That surfaces as a data integrity violation, is reported as HTTP 409, and is
- * safe for the caller to retry with the same idempotency key — by which point the customer
- * exists and the second attempt takes the update path. Recovering in place was considered
- * and rejected: it would require the insert to run in its own transaction so that its
- * failure did not poison the caller's persistence context, and that machinery is not worth
- * adding when the idempotency mechanism already makes a retry correct.
+ * Two payments naming the same unknown customer at once will both insert and the unique
+ * constraint rejects the second. That becomes a 409 and is safe to retry under the same
+ * idempotency key.
  */
 @Service
 public class CustomerService {
@@ -55,10 +41,10 @@ public class CustomerService {
     /**
      * Creates the customer if this reference has not been seen, otherwise refreshes it.
      *
-     * @param customerReference the organisation identifier from the message, or {@code null}
+     * @param customerReference the organisation identifier from the message, or null
      * @param name              the party name carried by the message
      * @param correlationId     the request being processed
-     * @return the stored customer, or {@code null} when the message carried no reference to
+     * @return the stored customer, or null when the message carried no reference to
      *         identify one by. A party without an identifier is a valid message that simply
      *         yields no customer record; inventing a key from the name would create
      *         duplicates on every spelling variation.
@@ -100,7 +86,7 @@ public class CustomerService {
      * @param accountNumber the account as written on the message
      * @param transitNumber the branch identifier carried by the corresponding agent
      * @param institution   the institution holding the account
-     * @param customer      the holder, or {@code null} if the message did not identify one
+     * @param customer      the holder, or null if the message did not identify one
      * @return the stored account
      */
     public Account resolveAccount(String accountNumber, String transitNumber,

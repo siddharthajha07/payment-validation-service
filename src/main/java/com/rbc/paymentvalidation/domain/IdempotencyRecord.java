@@ -8,29 +8,20 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 
 /**
- * The record of a request already answered, kept so the same request can be answered
- * again identically.
+ * A request already answered, kept so the same request can be answered identically.
  *
- * <h2>Why the response is stored rather than recomputed</h2>
- * A retry must receive the same answer as the original, and the response carries a digital
- * signature over its exact bytes. Rebuilding it would produce a different creation
- * timestamp and therefore a different signature, so a sender comparing the two would see
- * two different documents for one payment. Storing the response makes a replay genuinely
- * identical.
+ * The response is stored rather than recomputed because it carries a signature over its exact
+ * bytes; rebuilding it would produce a different timestamp and therefore a different
+ * signature, so a client comparing the two would see two documents for one payment.
  *
- * <h2>Why the request is hashed rather than stored</h2>
- * The hash detects the dangerous case: the same idempotency key presented with a
- * <em>different</em> payload, which means the caller has reused a key by mistake and must
- * be told rather than silently handed someone else's result. A hash answers that question
- * without retaining the payload, which carries names and account numbers — the
- * specification's instruction not to store or log sensitive data applies here as much as
- * to the logs.
+ * The request is hashed rather than stored. That detects the dangerous case, the same key with
+ * a different payload, without retaining a body full of names and account numbers.
  */
 @Entity
 @Table(name = "idempotency_record")
 public class IdempotencyRecord {
 
-    /** The client-supplied {@code X-Idempotency-Key}. */
+    /** The client-supplied X-Idempotency-Key. */
     @Id
     @Column(name = "idempotency_key", nullable = false, length = 64)
     private String idempotencyKey;

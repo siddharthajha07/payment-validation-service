@@ -10,11 +10,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * Verifies that the real chain is assembled in the intended order.
  *
- * <p>Ordering is load-bearing here — later rules are written to assume that earlier ones
- * have passed — but it is expressed only as {@code @Order} annotations spread across eight
+ * Ordering is load-bearing here — later rules are written to assume that earlier ones
+ * have passed — but it is expressed only as @Order annotations spread across eight
  * separate files. Nothing in the compiler checks that they are consistent. This test is
  * what turns an ordering mistake into a failing build rather than a
- * {@code NullPointerException} in production.
+ * NullPointerException in production.
  */
 @SpringBootTest
 class ValidationChainWiringTest {

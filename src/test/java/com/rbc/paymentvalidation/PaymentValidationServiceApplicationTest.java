@@ -6,8 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 /**
  * Verifies that the Spring application context starts successfully.
  *
- * <p>This is deliberately the first test in the project: almost every misconfiguration
- * — a missing dependency, an unresolvable bean, a malformed {@code application.yml} —
+ * This is deliberately the first test in the project: almost every misconfiguration
+ * — a missing dependency, an unresolvable bean, a malformed application.yml —
  * surfaces here as a startup failure rather than later as a confusing runtime error.
  */
 @SpringBootTest

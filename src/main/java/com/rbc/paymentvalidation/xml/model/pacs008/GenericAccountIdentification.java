@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * {@code Othr} — an account identified by a scheme other than IBAN, which is how the
+ * Othr — an account identified by a scheme other than IBAN, which is how the
  * domestic accounts in the supplied samples are expressed.
  */
 @XmlAccessorType(XmlAccessType.FIELD)

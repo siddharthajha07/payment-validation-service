@@ -1,11 +1,10 @@
 package com.rbc.paymentvalidation.xml.signature;
 
 /**
- * Raised when a status report cannot be signed.
+ * The status report could not be signed.
  *
- * <p>This is an internal fault, not a business outcome. An unsigned status report is not a
- * lesser response that could be sent anyway — a counterparty cannot act on a response it
- * cannot authenticate, so failing to sign means failing to answer.
+ * An internal fault, not a business outcome. An unsigned report is not a lesser response that
+ * could be sent anyway, since a counterparty cannot act on something it cannot authenticate.
  */
 public class XmlSignatureException extends RuntimeException {
 

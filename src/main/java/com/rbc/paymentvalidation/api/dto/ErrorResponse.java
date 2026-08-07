@@ -9,30 +9,22 @@ import jakarta.xml.bind.annotation.XmlType;
 import java.util.List;
 
 /**
- * A transport-level error, returned when no status report can be produced.
+ * A transport-level error, for when no status report can be produced.
  *
- * <h2>Why this is not a pacs.002</h2>
- * A status report must quote the identifiers of the message it reports on. When a payload
- * cannot be parsed, or a required header is absent, those identifiers were never read — so
- * any pacs.002 built in that situation would be inventing the very fields that give it
- * meaning. Returning a plainly different document says honestly that the request never
- * became a payment.
+ * A pacs.002 must quote the identifiers of the message it reports on, and when a payload could
+ * not be parsed those were never read, so any pacs.002 built here would be inventing the
+ * fields that give it meaning. Returning a plainly different document says honestly that the
+ * request never became a payment.
  *
- * <p>Business rejections are the opposite case and behave differently: the message was
- * understood, so it receives a properly signed pacs.002 carrying an ISO reason code.
- *
- * <h2>What it deliberately omits</h2>
- * No stack traces, no exception class names, no internal paths. Those describe the
- * service's construction rather than the caller's mistake, and publishing them hands an
- * attacker a map. The correlation id is included instead: it lets the caller quote one
- * value that leads an operator to the full detail, held where it belongs.
+ * No stack traces, exception names or internal paths. The correlation id is included instead,
+ * so the caller can quote one value that leads an operator to the detail.
  */
 @XmlRootElement(name = "ErrorResponse")
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"code", "message", "correlationId", "timestamp", "details"})
 public class ErrorResponse {
 
-    /** A stable, machine-readable classification, for example {@code MALFORMED_XML}. */
+    /** A stable, machine-readable classification, for example MALFORMED_XML. */
     @XmlElement(name = "Code")
     private String code;
 

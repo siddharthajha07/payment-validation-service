@@ -14,7 +14,7 @@ import org.w3c.dom.Document;
 /**
  * Tests for the hardened XML parser.
  *
- * <p>The attack cases carry most of the weight here: they demonstrate that the protection
+ * The attack cases carry most of the weight here: they demonstrate that the protection
  * required by the specification is real and enforced, rather than asserted in a comment.
  */
 class SecureXmlParserTest {

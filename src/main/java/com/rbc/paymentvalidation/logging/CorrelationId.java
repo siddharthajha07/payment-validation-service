@@ -4,18 +4,12 @@ import java.util.UUID;
 import org.slf4j.MDC;
 
 /**
- * The identifier that ties together everything one request produces.
+ * The identifier tying together everything one request produces.
  *
- * <h2>Why the mapped diagnostic context</h2>
- * The MDC is a per-thread map the logging framework consults when formatting each line.
- * Placing the correlation id there once means every subsequent log statement carries it
- * without any method having to accept or forward it. The alternative — threading an
- * identifier through every signature in the codebase — couples classes to a logging
- * concern they otherwise have no interest in.
- *
- * <p>The same identifier is written to the {@code payment} and {@code audit_event} tables
- * and returned in a response header, so one value connects the caller's report of a
- * problem, the log lines, and the database rows.
+ * The MDC is a per-thread map the logging framework reads when formatting each line, so
+ * setting it once means every later log statement carries it without any method having to pass
+ * it around. The same value goes on the payment and audit rows and comes back in a response
+ * header.
  */
 public final class CorrelationId {
 
@@ -30,7 +24,7 @@ public final class CorrelationId {
 
     /**
      * @return the identifier for the request being handled on this thread, or a newly
-     *         generated one if none has been set. Never {@code null}: code that records an
+     *         generated one if none has been set. Never null: code that records an
      *         audit event should not have to guard against a missing identifier, and an
      *         event filed under a fresh identifier is more useful than none at all.
      */
@@ -46,7 +40,7 @@ public final class CorrelationId {
     /**
      * Removes the identifier from this thread.
      *
-     * <p>Essential rather than tidy. Servlet containers pool and reuse threads, so an
+     * Essential rather than tidy. Servlet containers pool and reuse threads, so an
      * identifier left behind would attach itself to the next, unrelated request — and the
      * resulting logs would be actively misleading, which is worse than having none.
      */

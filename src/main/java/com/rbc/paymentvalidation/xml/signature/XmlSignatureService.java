@@ -32,36 +32,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Applies and verifies the enveloped XML digital signature on a status report.
+ * Applies and verifies the enveloped XML signature on a status report.
  *
- * <h2>What "enveloped" means and why the details matter</h2>
- * The signature sits inside the document it signs, in {@code AppHdr/Sgntr}. Three choices
- * make that work, and each one silently invalidates the signature if it is wrong.
+ * The signature sits inside the document it signs, in AppHdr/Sgntr. The reference URI is empty
+ * (the whole document) with the enveloped transform removing the signature itself from what is
+ * hashed, since it cannot cover its own value. Canonicalisation matters because two documents
+ * can mean the same thing and differ byte for byte, which is also why a signed document must
+ * never be reformatted.
  *
- * <p><strong>The reference URI is the empty string</strong>, which means "everything in
- * this document". Paired with it is the {@code enveloped-signature} transform, which
- * removes the signature element itself from what is hashed — without it the signature
- * would have to cover its own value, which is impossible.
- *
- * <p><strong>Canonicalisation.</strong> Two XML documents can be semantically identical yet
- * differ byte for byte: attribute order, namespace declarations, whitespace. A signature
- * is over bytes, so both signer and verifier must agree on one canonical byte form first.
- * That is what C14N is for, and it is why a signed document must never be reformatted.
- *
- * <p><strong>Nothing may touch the document after signing.</strong> Pretty-printing a
- * signed document is the classic way to break it: the XML still means the same thing, the
- * bytes differ, and the digest no longer matches.
- *
- * <h2>Why the certificate is included</h2>
- * {@code KeyInfo} carries the subject name and issuer serial, matching the supplied
- * samples, and also the certificate itself. Including it lets a receiver verify the
- * signature without having been given the certificate in advance — they must still decide
- * whether they <em>trust</em> it, which is a separate question answered by checking the
- * issuer against their own trust store.
- *
- * <h2>Thread safety</h2>
- * {@link XMLSignatureFactory} instances are not documented as thread-safe, so one is
- * created per call. The key material is immutable and loaded once at startup.
+ * KeyInfo includes the certificate so a receiver can verify without being sent it first.
+ * Whether they trust it is a separate question. XMLSignatureFactory is not documented as
+ * thread-safe so one is made per call.
  */
 @Component
 public class XmlSignatureService {
@@ -98,9 +79,9 @@ public class XmlSignatureService {
     }
 
     /**
-     * Signs the document in place, inserting the signature into {@code AppHdr/Sgntr}.
+     * Signs the document in place, inserting the signature into AppHdr/Sgntr.
      *
-     * <p>The document must not be modified afterwards — not even reformatted — or the
+     * The document must not be modified afterwards — not even reformatted — or the
      * signature will no longer verify.
      *
      * @param document the marshalled status report
@@ -138,7 +119,7 @@ public class XmlSignatureService {
     /**
      * Verifies the signature on a document against this service's own certificate.
      *
-     * <p>Used by the tests to prove the signature is genuinely valid over the bytes
+     * Used by the tests to prove the signature is genuinely valid over the bytes
      * produced, rather than merely present.
      *
      * @return true if a signature is present and valid
@@ -171,22 +152,21 @@ public class XmlSignatureService {
     }
 
     /**
-     * Creates the {@code Sgntr} element the signature is placed inside.
+     * Creates the Sgntr element the signature is placed inside.
      *
-     * <p>{@code Sgntr} belongs to the business header namespace and is the last element of
+     * Sgntr belongs to the business header namespace and is the last element of
      * the header, which is where the ISO business application header defines it.
      *
-     * <h3>Why the namespace is declared explicitly</h3>
-     * {@code createElementNS} produces a node that knows its namespace but carries no
-     * {@code xmlns} attribute. Canonicalisation works from the attributes actually present,
+     * createElementNS produces a node that knows its namespace but carries no
+     * xmlns attribute. Canonicalisation works from the attributes actually present,
      * so the signature would be computed over a form of this element with no namespace
      * declaration — while the serialiser, needing to emit correct XML, writes one anyway.
      * The bytes the receiver parses would then differ from the bytes that were signed, and
      * the signature would fail to verify for no visible reason.
      *
-     * <p>Declaring it here makes the in-memory document and its serialised form agree. This
+     * Declaring it here makes the in-memory document and its serialised form agree. This
      * is a well-known trap when signing a DOM built in code rather than parsed from text,
-     * and {@code signatureSurvivesSerialisation} in the tests exists to keep it fixed.
+     * and signatureSurvivesSerialisation in the tests exists to keep it fixed.
      */
     private Element createSignatureContainer(Document document) {
         NodeList headers = document.getElementsByTagNameNS(

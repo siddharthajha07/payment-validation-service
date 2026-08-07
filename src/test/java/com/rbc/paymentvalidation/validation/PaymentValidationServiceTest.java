@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests the behaviour of the chain itself, using stub rules rather than the real ones.
  *
- * <p>Using stubs is deliberate: this class is responsible for <em>how rules are run</em>,
+ * Using stubs is deliberate: this class is responsible for how rules are run,
  * not for what any particular rule decides. Testing it against the real rules would couple
  * these tests to every business rule in the system, so a change to one rule would break
  * tests about orchestration.

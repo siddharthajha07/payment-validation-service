@@ -23,25 +23,16 @@ import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 
 /**
- * Runs a payment request through the whole pipeline and decides what to send back.
+ * Runs a request through the pipeline and decides what to send back.
  *
- * <p>This is the one place the sequence is visible end to end. Every step is delegated:
- * this class decides <em>what happens in what order</em>, and nothing else. That is what
- * keeps it readable enough to answer "walk me through a request" by pointing at a single
- * method.
+ * The one place the sequence is visible end to end. Everything is delegated, so this class
+ * decides what happens in what order and nothing else.
  *
- * <h2>The order is not arbitrary</h2>
- * The idempotency check comes first, before any parsing, because a replay must be
- * recognisable without redoing the work it is replaying — and because a primary-key lookup
- * is the cheapest thing available. Parsing precedes validation because rules cannot be
- * applied to a document that has not been read. Persistence precedes response building
- * because the response reports what was recorded. Storing the idempotency record comes
- * last, once there is a final answer worth replaying.
- *
- * <h2>Why this class is not transactional as a whole</h2>
- * The persistence steps manage their own transactions, and audit events deliberately
- * commit independently. Wrapping everything in one transaction would undo that: a failure
- * late in the pipeline would erase the audit trail describing it.
+ * The order is not arbitrary. Idempotency comes first, before parsing, because a replay must
+ * be recognised without redoing the work it replays. Persistence precedes the response because
+ * the response reports what was recorded. It is deliberately not transactional as a whole:
+ * audit events commit independently on purpose, and one enclosing transaction would let a late
+ * failure erase the trail describing it.
  */
 @Service
 public class PaymentProcessingService {
@@ -80,13 +71,6 @@ public class PaymentProcessingService {
         this.auditService = auditService;
     }
 
-    /**
-     * @param payload         the raw request body
-     * @param idempotencyKey  the client's key for this request
-     * @param declaredSender  the institution the caller says it is
-     * @param correlationId   the identifier tying together everything this request produces
-     * @return the status and body to return
-     */
     public ProcessingOutcome process(byte[] payload, String idempotencyKey,
                                      String declaredSender, String correlationId) {
         String requestHash = idempotencyService.hash(payload);
@@ -150,7 +134,7 @@ public class PaymentProcessingService {
     /**
      * Marshals, signs and serialises a status report.
      *
-     * <p>The order is fixed: build the document, sign it, then serialise exactly as it
+     * The order is fixed: build the document, sign it, then serialise exactly as it
      * stands. Anything that reformats the document between signing and serialising would
      * invalidate the signature while leaving the XML looking correct.
      */

@@ -17,23 +17,15 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 /**
- * A payment instruction that was received, together with the decision made about it.
+ * A payment instruction that was received, and what we decided about it.
  *
- * <h2>Rejected payments are stored too</h2>
- * A rejection is a business outcome, not an error, and it is exactly what an operator
- * needs to see when a sender asks why their payment did not arrive. Storing only accepted
- * payments would make the most common support question unanswerable.
+ * Rejected payments are stored too, because that is what an operator needs when a sender asks
+ * why their payment did not arrive.
  *
- * <h2>Why the transaction identifier is unique</h2>
- * The unique constraint makes duplicate detection a guarantee of the database rather than
- * a hope of the application. Two concurrent requests carrying the same transaction can
- * both pass an application-level "does this exist?" check before either inserts; the
- * unique index is what makes the second insert fail instead of creating a second payment.
- *
- * <h2>Amount storage</h2>
- * {@code BigDecimal} with an explicit precision and scale. ISO 20022 permits up to five
- * fraction digits, so the column allows five even though the currency in the samples uses
- * two — truncating at the boundary would silently alter a value the sender specified.
+ * The unique transaction id makes duplicate detection a guarantee of the database rather than
+ * a hope of the application: two concurrent requests can both pass an application check before
+ * either inserts, and the index is what stops the second. The amount is BigDecimal because
+ * double cannot represent 1.02 exactly.
  */
 @Entity
 @Table(name = "payment",
@@ -53,11 +45,11 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** {@code BizMsgIdr} from the business header. */
+    /** BizMsgIdr from the business header. */
     @Column(name = "business_message_id", length = 35)
     private String businessMessageId;
 
-    /** {@code GrpHdr/MsgId} from the document. */
+    /** GrpHdr/MsgId from the document. */
     @Column(name = "message_id", length = 35)
     private String messageId;
 
@@ -101,7 +93,7 @@ public class Payment {
     @Column(name = "status", nullable = false, length = 20)
     private PaymentStatus status;
 
-    /** ISO external status reason code when rejected, for example {@code AC01}. */
+    /** ISO external status reason code when rejected, for example AC01. */
     @Column(name = "reason_code", length = 4)
     private String reasonCode;
 

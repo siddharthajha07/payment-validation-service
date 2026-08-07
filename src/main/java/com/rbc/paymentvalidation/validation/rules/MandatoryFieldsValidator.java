@@ -12,22 +12,15 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Confirms that every element this service needs in order to process a payment is present.
+ * Checks that every element this service needs is actually present.
  *
- * <h2>Why this exists when there is already a schema</h2>
- * The schema enforces what ISO 20022 requires; this rule enforces what <em>this service</em>
- * requires, and the two are not the same. The clearest example is {@code TxId}, which ISO
- * makes optional but which this service uses as the natural key for duplicate detection —
- * a message without one cannot be processed safely, so it is business-mandatory here even
- * though it is schema-optional.
+ * The schema enforces what ISO requires; this enforces what we require, and they differ. TxId
+ * is the clearest case: ISO makes it optional, but duplicate detection depends on it, so a
+ * message without one cannot be processed safely.
  *
- * <p>It runs first because every later rule depends on it. Once this rule passes, no other
- * rule needs to guard against an absent element, which is what keeps the rest of the chain
- * readable.
- *
- * <p>Unlike the other rules, this one reports every missing element it finds rather than
- * stopping at the first. Someone repairing a message should learn everything that is
- * absent in one exchange.
+ * It runs first so no later rule has to guard against a missing element. Unlike the others it
+ * reports everything it finds rather than stopping at the first, because someone repairing a
+ * message should learn all of it in one exchange.
  */
 @Component
 @Order(10)

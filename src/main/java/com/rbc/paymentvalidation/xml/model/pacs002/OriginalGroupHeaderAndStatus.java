@@ -6,14 +6,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 import java.util.List;
 
-/**
- * {@code OrgnlGrpInfAndSts} — identifies the message being reported on and its outcome.
- *
- * <p>The original message identifier and message name are what let the receiver match this
- * report to the payment it sent. Without them a status report is unattributable, which is
- * why a message that fails to parse cannot be answered with a pacs.002 at all: those
- * identifiers could not be read.
- */
+/** OrgnlGrpInfAndSts — identifies the message being reported on and its outcome. */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"originalMessageIdentification", "originalMessageNameIdentification",
         "groupStatus", "statusReasonInformation"})
@@ -25,7 +18,7 @@ public class OriginalGroupHeaderAndStatus {
     @XmlElement(name = "OrgnlMsgNmId")
     private String originalMessageNameIdentification;
 
-    /** {@code ACCP} when accepted, {@code RJCT} when rejected. */
+    /** ACCP when accepted, RJCT when rejected. */
     @XmlElement(name = "GrpSts")
     private String groupStatus;
 

@@ -5,12 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 
-/**
- * {@code GrpHdr} of the status report: who is reporting, when, and to whom.
- *
- * <p>{@code InstdAgt} is the agent being instructed by this report — the institution that
- * sent the original payment and is now being told its outcome.
- */
+/** GrpHdr of the status report: who is reporting, when, and to whom. */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"messageIdentification", "creationDateTime", "instructedAgent"})
 public class StatusGroupHeader {

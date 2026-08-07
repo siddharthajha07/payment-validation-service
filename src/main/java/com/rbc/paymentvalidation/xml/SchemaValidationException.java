@@ -3,13 +3,10 @@ package com.rbc.paymentvalidation.xml;
 import java.util.List;
 
 /**
- * Raised when a payload is well-formed XML but does not conform to the message schema —
- * a missing mandatory element, elements out of order, or a value in the wrong lexical
- * form.
+ * A well-formed document that does not match the message schema.
  *
- * <p>All schema violations found are retained rather than only the first, so a sender
- * correcting a message learns everything that is wrong in one exchange instead of
- * discovering faults one round trip at a time.
+ * Every violation is kept rather than just the first, so a sender correcting a message learns
+ * everything that is wrong in one exchange instead of one fault per round trip.
  */
 public class SchemaValidationException extends XmlProcessingException {
 

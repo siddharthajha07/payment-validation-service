@@ -5,13 +5,10 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * The recurring ISO 20022 "code or proprietary" choice: either an externally published
- * code ({@code Cd}) or a scheme-specific value ({@code Prtry}).
+ * The recurring ISO choice between a published code and a scheme-specific value.
  *
- * <p>One class serves {@code SvcLvl}, {@code LclInstrm}, {@code CtgyPurp} and
- * {@code ClrSys}, which are structurally identical and share the pacs.008 namespace. The
- * element name is supplied by the {@code @XmlElement} annotation on the containing field,
- * so the same binding is reusable across all four without ambiguity.
+ * One class serves SvcLvl, LclInstrm, CtgyPurp and ClrSys: they are structurally identical and
+ * share a namespace, and the element name comes from the field annotation in the parent.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CodeOrProprietary {
