@@ -46,3 +46,17 @@ payment:
     # is never expanded in memory. One megabyte comfortably exceeds a realistic pacs.008
     # while leaving no room for a resource-exhaustion attempt.
     max-payload-bytes: 1048576
+
+  validation:
+    # The only currency this deployment settles, matching the clearing system in the
+    # supplied samples.
+    supported-currency: BBD
+    # Decimal places permitted on a settlement amount.
+    max-fraction-digits: 2
+    # Digits required in a branch transit identifier. The assessment specifies three; the
+    # supplied sample carries five (05605), so the sample fails this rule as written. Held
+    # in configuration so the conflict can be resolved without a code change. See
+    # ASSUMPTIONS.md.
+    transit-number-length: 3
+    # How far ahead a settlement date may be dated.
+    max-future-settlement-days: 2

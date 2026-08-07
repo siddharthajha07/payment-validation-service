@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 public final class SampleMessages {
 
     private static final String PACS_008_SAMPLE = "samples/pacs008-sample.xml";
+    private static final String PACS_008_VALID = "samples/pacs008-valid.xml";
 
     private SampleMessages() {
     }
@@ -28,6 +29,24 @@ public final class SampleMessages {
     /** @return the supplied pacs.008 sample as text, for tests that mutate it. */
     public static String pacs008SampleAsText() {
         return new String(pacs008Sample(), StandardCharsets.UTF_8);
+    }
+
+    /**
+     * A message that satisfies every business rule, derived from the supplied sample.
+     *
+     * <p>The supplied sample deliberately does <em>not</em> satisfy them: its accounts
+     * carry no institution prefix and its branch transit identifiers are five digits where
+     * the assessment specifies three. Rather than bend the rules to fit the sample, this
+     * fixture adjusts exactly four values — the two account numbers and the two transit
+     * identifiers — and everything else is byte-for-byte the message as provided.
+     */
+    public static byte[] pacs008Valid() {
+        return read(PACS_008_VALID);
+    }
+
+    /** @return the conformant fixture as text, for tests that mutate it. */
+    public static String pacs008ValidAsText() {
+        return new String(pacs008Valid(), StandardCharsets.UTF_8);
     }
 
     private static byte[] read(String location) {
