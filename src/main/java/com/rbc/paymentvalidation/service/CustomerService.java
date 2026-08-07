@@ -6,6 +6,7 @@ import com.rbc.paymentvalidation.domain.Customer;
 import com.rbc.paymentvalidation.domain.Institution;
 import com.rbc.paymentvalidation.repository.AccountRepository;
 import com.rbc.paymentvalidation.repository.CustomerRepository;
+import com.rbc.paymentvalidation.logging.MaskingUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -120,7 +121,8 @@ public class CustomerService {
         // need to see full account numbers, and the last four digits identify it well
         // enough to investigate with.
         auditService.record(correlationId, AuditEventType.ACCOUNT_CREATED,
-                "Created account %s at %s".formatted(mask(accountNumber), institution.getBic()));
+                "Created account %s at %s".formatted(
+                        MaskingUtil.maskAccountNumber(accountNumber), institution.getBic()));
         return created;
     }
 
@@ -128,20 +130,10 @@ public class CustomerService {
                                    String correlationId) {
         if (existing.applyDetails(transitNumber, customer)) {
             auditService.record(correlationId, AuditEventType.ACCOUNT_UPDATED,
-                    "Updated account %s at %s".formatted(mask(existing.getAccountNumber()),
+                    "Updated account %s at %s".formatted(
+                            MaskingUtil.maskAccountNumber(existing.getAccountNumber()),
                             existing.getInstitution().getBic()));
         }
         return existing;
-    }
-
-    /**
-     * @return the account number reduced to its last four characters. Enough to recognise
-     *         which account is meant, not enough to reconstruct it.
-     */
-    private String mask(String accountNumber) {
-        if (accountNumber == null || accountNumber.length() <= 4) {
-            return "****";
-        }
-        return "****" + accountNumber.substring(accountNumber.length() - 4);
     }
 }

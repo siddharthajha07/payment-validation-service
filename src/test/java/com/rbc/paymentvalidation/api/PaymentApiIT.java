@@ -15,6 +15,7 @@ import java.time.Clock;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -23,8 +24,6 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 
 /**
  * End-to-end tests through the HTTP endpoint against the real application.
@@ -37,6 +36,7 @@ import org.springframework.web.context.WebApplicationContext;
  * failing for a reason unrelated to any change in the code.
  */
 @SpringBootTest
+@AutoConfigureMockMvc
 @Import(PaymentApiIT.FixedClockConfiguration.class)
 class PaymentApiIT {
 
@@ -49,8 +49,16 @@ class PaymentApiIT {
         }
     }
 
+    /**
+     * Injected rather than built from the context.
+     *
+     * <p>{@code MockMvcBuilders.webAppContextSetup(...).build()} wires the dispatcher but
+     * <em>not</em> the servlet filters, so {@code CorrelationIdFilter} would never run and
+     * every response would lack its correlation header — a failure of the test setup that
+     * looks exactly like a failure of the application.
+     */
     @Autowired
-    private WebApplicationContext webApplicationContext;
+    private MockMvc mockMvc;
 
     @Autowired
     private PaymentRepository paymentRepository;
@@ -66,10 +74,6 @@ class PaymentApiIT {
 
     @Autowired
     private SecureXmlParser parser;
-
-    private MockMvc mockMvc() {
-        return MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
 
     /**
      * The conformant message carrying a transaction identifier unique to one test.
@@ -88,7 +92,7 @@ class PaymentApiIT {
     }
 
     private MvcResult submit(String idempotencyKey, byte[] body) throws Exception {
-        return mockMvc().perform(post("/api/v1/payments")
+        return mockMvc.perform(post("/api/v1/payments")
                         .contentType(MediaType.APPLICATION_XML)
                         .header(PaymentController.IDEMPOTENCY_KEY_HEADER, idempotencyKey)
                         .header(PaymentController.SENDER_INSTITUTION_HEADER, "BANKA000")
@@ -209,7 +213,7 @@ class PaymentApiIT {
     @Test
     @DisplayName("echoes a caller-supplied correlation id")
     void echoesSuppliedCorrelationId() throws Exception {
-        MvcResult result = mockMvc().perform(post("/api/v1/payments")
+        MvcResult result = mockMvc.perform(post("/api/v1/payments")
                         .contentType(MediaType.APPLICATION_XML)
                         .header(PaymentController.IDEMPOTENCY_KEY_HEADER, "it-correlation")
                         .header(PaymentController.SENDER_INSTITUTION_HEADER, "BANKA000")

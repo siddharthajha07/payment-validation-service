@@ -1,8 +1,9 @@
 package com.rbc.paymentvalidation.api;
 
+import com.rbc.paymentvalidation.logging.CorrelationId;
+import com.rbc.paymentvalidation.logging.MaskingUtil;
 import com.rbc.paymentvalidation.service.PaymentProcessingService;
 import com.rbc.paymentvalidation.service.ProcessingOutcome;
-import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -50,10 +51,14 @@ public class PaymentController {
     /**
      * Accepts an ISO 20022 pacs.008 and returns a signed pacs.002.
      *
-     * @param payload          the pacs.008 message
-     * @param idempotencyKey   uniquely identifies this submission, so a retry is recognised
+     * <p>The correlation id is not a parameter here. {@code CorrelationIdFilter} has
+     * already resolved it and published it to the diagnostic context, which means requests
+     * that never reach this method — an unreadable body, a missing header — are traceable
+     * too. Those are the requests somebody is most likely to ask about later.
+     *
+     * @param payload           the pacs.008 message
+     * @param idempotencyKey    uniquely identifies this submission, so a retry is recognised
      * @param senderInstitution the BIC the caller claims to be sending as
-     * @param correlationId    optional client trace id; one is generated when absent
      * @return the signed status report, with a status reflecting the outcome
      */
     @PostMapping(consumes = MediaType.APPLICATION_XML_VALUE,
@@ -61,35 +66,18 @@ public class PaymentController {
     public ResponseEntity<String> submitPayment(
             @RequestBody byte[] payload,
             @RequestHeader(IDEMPOTENCY_KEY_HEADER) String idempotencyKey,
-            @RequestHeader(SENDER_INSTITUTION_HEADER) String senderInstitution,
-            @RequestHeader(name = CORRELATION_ID_HEADER, required = false) String correlationId) {
+            @RequestHeader(SENDER_INSTITUTION_HEADER) String senderInstitution) {
 
-        String resolvedCorrelationId = resolveCorrelationId(correlationId);
-        log.info("Received payment submission");
+        String correlationId = CorrelationId.current();
+        // Size only. The payload carries names and account numbers and is never logged.
+        log.info("Received payment submission {}", MaskingUtil.describePayload(payload));
 
         ProcessingOutcome outcome = processingService.process(payload, idempotencyKey,
-                senderInstitution, resolvedCorrelationId);
+                senderInstitution, correlationId);
 
         return ResponseEntity.status(outcome.httpStatus())
                 .contentType(MediaType.APPLICATION_XML)
-                // Echoed so the caller can quote it when reporting a problem, which is what
-                // makes one request traceable through logs and the audit trail.
-                .header(CORRELATION_ID_HEADER, resolvedCorrelationId)
                 .header(REPLAY_HEADER, Boolean.toString(outcome.replay()))
                 .body(outcome.responseXml());
-    }
-
-    /**
-     * @return the caller's correlation id, or a new one. A caller that supplies its own can
-     *         match our logs to theirs; one that does not still gets a request that can be
-     *         traced from end to end.
-     */
-    private String resolveCorrelationId(String supplied) {
-        if (supplied == null || supplied.isBlank()) {
-            return UUID.randomUUID().toString();
-        }
-        // Bounded to the width of the column that stores it, and to keep a caller from
-        // filling the logs with an arbitrarily long value.
-        return supplied.length() > 36 ? supplied.substring(0, 36) : supplied;
     }
 }

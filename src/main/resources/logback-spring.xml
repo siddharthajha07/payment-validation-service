@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Logging configuration.
+
+    Every line carries the correlation identifier of the request that produced it, taken
+    from the mapped diagnostic context that CorrelationIdFilter populates. That single
+    value is what makes one request's history retrievable: the same identifier appears on
+    the response header the caller received, on the payment row, and on every audit event.
+    Without it, investigating a complaint means searching by timestamp and hoping no other
+    traffic arrived at the same moment.
+
+    Two appenders are configured. The console pattern is written for a person reading a
+    terminal. The JSON-shaped pattern is written for a log aggregator, where fields matter
+    more than alignment; it is inactive by default and enabled with the "json-logs"
+    profile, because a production deployment ships logs somewhere that parses them.
+-->
+<configuration>
+
+    <springProperty scope="context" name="applicationName" source="spring.application.name"/>
+
+    <!--
+        %X{correlationId} reads the value from the diagnostic context. The -36 pads it to a
+        fixed width so messages stay aligned and remain scannable by eye.
+    -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %5level [%-36X{correlationId:-no-correlation-id}] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <springProfile name="json-logs">
+        <appender name="JSON" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>{"timestamp":"%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}","level":"%level","application":"${applicationName}","correlationId":"%X{correlationId:-}","logger":"%logger","thread":"%thread","message":"%replace(%msg){'"','\\"'}"}%n</pattern>
+            </encoder>
+        </appender>
+
+        <root level="INFO">
+            <appender-ref ref="JSON"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="!json-logs">
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <logger name="com.rbc.paymentvalidation" level="DEBUG"/>
+
+    <!--
+        Hibernate's SQL logging is left off deliberately. Bound parameters include account
+        numbers and customer names, so switching it on would write to the log precisely the
+        data this service takes care to keep out of it.
+    -->
+    <logger name="org.hibernate.SQL" level="WARN"/>
+    <logger name="org.hibernate.orm.jdbc.bind" level="WARN"/>
+
+</configuration>
