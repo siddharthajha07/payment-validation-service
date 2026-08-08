@@ -10,23 +10,14 @@ import org.springframework.stereotype.Component;
 /**
  * Checks who the message says it is from and to.
  *
- * <h2>Sender and receiver must differ</h2>
- * An institution cannot send a payment to itself through a clearing system. Such a message
- * is either a configuration error at the sender or an attempt to have the scheme process
- * something that has no business being there, and in both cases the sender needs to be
- * told rather than have the message quietly processed.
+ * An institution cannot clear a payment to itself, so identical sender and receiver is either
+ * a configuration error or an attempt to push something through the scheme that does not
+ * belong there. Either way the sender needs telling.
  *
- * <h2>The declared sender must match the message</h2>
- * The caller supplies {@code X-Sender-Institution} on the request and also names a sender
- * in the business header. If those disagree, one of two things is happening: a
- * misconfigured client, or a caller attempting to submit a message on another
- * institution's behalf. Comparing them costs nothing and closes that gap.
- *
- * <p>This is authentication-adjacent but not authentication. A production deployment would
- * establish the caller's identity from a mutual-TLS client certificate and check the header
- * against <em>that</em>, rather than trusting a value the caller also supplied. The check
- * as written catches honest misconfiguration; it does not stop a determined impersonator,
- * and it is documented that way.
+ * The caller also declares a sender in X-Sender-Institution, and comparing that to the header
+ * costs nothing. Note this is not authentication: it catches a misconfigured client but not a
+ * determined impersonator, since the caller supplies both values. Production would take the
+ * identity from a mutual-TLS client certificate and check the header against that.
  */
 @Component
 @Order(20)

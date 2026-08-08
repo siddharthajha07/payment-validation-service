@@ -8,19 +8,14 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 
 /**
- * Converts a validated DOM document into the {@link Pacs008Message} object graph.
+ * Turns a validated document into the Pacs008Message object graph.
  *
- * <h2>Why unmarshalling happens from a DOM rather than from the raw bytes</h2>
- * The payload is parsed once, by {@link SecureXmlParser}, and the resulting document is
- * then validated and unmarshalled. Handing the raw bytes to JAXB instead would mean
- * parsing a second time with a parser this class does not control — and therefore has not
- * hardened — which would reopen the external-entity hole that {@code SecureXmlParser}
- * closes. Parsing once, securely, and reusing the result is both safer and faster.
+ * Unmarshalling works from the DOM the secure parser already produced. Handing the raw bytes
+ * to JAXB would parse them a second time with a parser we have not hardened, which would put
+ * back the external entity hole SecureXmlParser exists to close.
  *
- * <h2>Thread safety</h2>
- * A {@link JAXBContext} is immutable, safe to share, and expensive to build, so one is
- * created at startup. An {@link Unmarshaller} is neither immutable nor thread-safe, so a
- * fresh one is created per message; that is cheap once the context exists.
+ * JAXBContext is immutable and expensive, so one is built at startup; Unmarshaller is neither,
+ * so one is made per message.
  */
 @Component
 public class Pacs008Unmarshaller {
@@ -37,11 +32,6 @@ public class Pacs008Unmarshaller {
         }
     }
 
-    /**
-     * @param document a document already validated against the pacs.008 schema
-     * @return the bound message
-     * @throws XmlProcessingException if the document cannot be bound to the model
-     */
     public Pacs008Message unmarshal(Document document) {
         try {
             Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();

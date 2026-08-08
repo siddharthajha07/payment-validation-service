@@ -13,7 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 /**
  * Tests for customer maintenance.
  *
- * <p>{@code @DataJpaTest} starts only the persistence layer against an in-memory database
+ * @DataJpaTest starts only the persistence layer against an in-memory database
  * and rolls each test back afterwards, so these run in milliseconds and cannot leak state
  * into one another.
  */

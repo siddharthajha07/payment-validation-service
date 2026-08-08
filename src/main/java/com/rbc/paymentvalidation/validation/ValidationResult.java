@@ -3,13 +3,10 @@ package com.rbc.paymentvalidation.validation;
 import java.util.List;
 
 /**
- * The outcome of applying a validation rule, or of the whole chain.
+ * The outcome of one rule, or of the whole chain.
  *
- * <p>A result is valid when it holds no errors. A single rule may report several errors at
- * once — an amount validator checking every transaction in a batch, for example — while
- * the chain as a whole reports the errors of the first rule that failed.
- *
- * @param errors every fault this rule found, in the order found
+ * Valid means no errors. A single rule may report several at once, while the chain reports the
+ * errors of the first rule that failed.
  */
 public record ValidationResult(List<ValidationError> errors) {
 

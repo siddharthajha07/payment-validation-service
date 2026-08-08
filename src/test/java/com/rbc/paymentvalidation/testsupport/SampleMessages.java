@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 /**
  * Loads the message fixtures used by the tests.
  *
- * <p>{@code pacs008-sample.xml} is the pacs.008 supplied with the assessment, copied
+ * pacs008-sample.xml is the pacs.008 supplied with the assessment, copied
  * verbatim rather than retyped. Testing against the real message is the point: a fixture
  * tidied to suit the parser would prove nothing about the traffic this service will
  * actually receive.
@@ -34,7 +34,7 @@ public final class SampleMessages {
     /**
      * A message that satisfies every business rule, derived from the supplied sample.
      *
-     * <p>The supplied sample deliberately does <em>not</em> satisfy them: its accounts
+     * The supplied sample deliberately does not satisfy them: its accounts
      * carry no institution prefix and its branch transit identifiers are five digits where
      * the assessment specifies three. Rather than bend the rules to fit the sample, this
      * fixture adjusts exactly four values — the two account numbers and the two transit

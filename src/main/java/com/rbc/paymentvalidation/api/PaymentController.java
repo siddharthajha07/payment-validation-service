@@ -17,19 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * The HTTP entry point for submitting a payment.
  *
- * <h2>Why the body is taken as bytes</h2>
- * The request is bound as {@code byte[]} rather than a mapped object. Letting Spring
- * deserialise the XML would mean a parser this service has not hardened reading untrusted
- * input before any of our code runs — precisely the exposure {@code SecureXmlParser}
- * exists to prevent. Taking the raw bytes keeps the hardened parser first in line.
+ * The body is bound as byte[] rather than a mapped object, so Spring never puts an unhardened
+ * parser in front of untrusted input before our code runs. It also means the idempotency hash
+ * is over exactly what the client sent.
  *
- * <p>It also matters for idempotency: the hash must be over exactly what the client sent,
- * not over a re-serialisation of it.
- *
- * <h2>How thin this class is, deliberately</h2>
- * The controller resolves the correlation id, delegates, and translates the outcome into a
- * response. It contains no business logic at all, which is what allows the pipeline to be
- * tested without HTTP and the HTTP layer to be tested without a database.
+ * The correlation id comes from the filter, not a parameter, so requests that never reach this
+ * method are traceable too.
  */
 @RestController
 @RequestMapping("/api/v1/payments")
@@ -51,7 +44,7 @@ public class PaymentController {
     /**
      * Accepts an ISO 20022 pacs.008 and returns a signed pacs.002.
      *
-     * <p>The correlation id is not a parameter here. {@code CorrelationIdFilter} has
+     * The correlation id is not a parameter here. CorrelationIdFilter has
      * already resolved it and published it to the diagnostic context, which means requests
      * that never reach this method — an unreadable body, a missing header — are traceable
      * too. Those are the requests somebody is most likely to ask about later.

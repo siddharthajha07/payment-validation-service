@@ -9,20 +9,19 @@ import jakarta.persistence.Table;
 import java.time.Instant;
 
 /**
- * A financial institution that may appear as an agent on a payment.
+ * A financial institution that can appear as an agent on a payment.
  *
- * <h2>Why the account prefix is a column rather than a rule in code</h2>
- * The assessment states that institution A uses FI-prefixed account numbers and
- * institution B uses RI-prefixed ones. Expressing that as {@code if (bic.equals(...))}
- * inside a validator would mean a code change, a build and a deployment every time a
- * participant joins the scheme or changes convention. Holding it as reference data means
- * the validator asks the institution what its prefix is, and onboarding a third
- * institution becomes an insert.
+ * The account prefix is a column rather than a rule in code. The brief says institution A uses
+ * FI-prefixed accounts and B uses RI; writing that as an if statement in a validator would
+ * mean a code change, build and deployment every time a participant joins or changes
+ * convention. As reference data, onboarding a third institution is an insert.
  *
- * <p>{@code accountPrefix} is nullable because not every institution holds customer
- * accounts. The clearing system in the supplied samples ({@code CBANK0IPS}) is a
- * legitimate message counterparty but never a debtor or creditor agent, so it has no
- * prefix and the compatibility rule does not apply to it.
+ * The prefix is nullable because not every institution holds customer accounts. The clearing
+ * system is a legitimate counterparty on the business header but never a debtor or creditor
+ * agent.
+ *
+ * Suspension is a flag rather than a delete, so historical payments keep pointing at a row
+ * that still exists.
  */
 @Entity
 @Table(name = "institution")
@@ -38,7 +37,7 @@ public class Institution {
     @Column(name = "name", length = 140)
     private String name;
 
-    /** {@code FI}, {@code RI}, or null for an institution that holds no customer accounts. */
+    /** FI, RI, or null for an institution that holds no customer accounts. */
     @Column(name = "account_prefix", length = 4)
     private String accountPrefix;
 

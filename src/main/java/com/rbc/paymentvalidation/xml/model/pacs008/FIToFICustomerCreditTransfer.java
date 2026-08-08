@@ -7,12 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * {@code FIToFICstmrCdtTrf} — the pacs.008 document itself: one group header followed by
+ * FIToFICstmrCdtTrf — the pacs.008 document itself: one group header followed by
  * one or more credit transfer transactions.
- *
- * <p>The transaction list is modelled as a list even though the samples carry a single
- * transaction. A pacs.008 is a batch message by definition, and assuming a single
- * transaction would silently drop the remainder of a valid multi-transaction message.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class FIToFICustomerCreditTransfer {

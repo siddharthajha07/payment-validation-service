@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.MvcResult;
 /**
  * End-to-end tests for requests that never become payments.
  *
- * <p>Each of these returns an {@code ErrorResponse} rather than a pacs.002, and the reason
+ * Each of these returns an ErrorResponse rather than a pacs.002, and the reason
  * is the same in every case: a status report has to quote the identifiers of the message it
  * reports on, and in none of these situations were those identifiers successfully read.
  */
@@ -44,8 +44,8 @@ class ErrorHandlingIT {
     /**
      * Injected rather than built from the context.
      *
-     * <p>{@code MockMvcBuilders.webAppContextSetup(...).build()} wires the dispatcher but
-     * <em>not</em> the servlet filters, so {@code CorrelationIdFilter} would never run and
+     * MockMvcBuilders.webAppContextSetup(...).build() wires the dispatcher but
+     * not the servlet filters, so CorrelationIdFilter would never run and
      * these tests would report a missing correlation header as an application fault when it
      * is really a gap in the test setup.
      */
@@ -193,6 +193,24 @@ class ErrorHandlingIT {
         assertThat(result.getResponse().getHeader(PaymentController.CORRELATION_ID_HEADER))
                 .isEqualTo("trace-me");
         assertThat(bodyOf(result)).contains("<CorrelationId>trace-me</CorrelationId>");
+    }
+
+    @Test
+    @DisplayName("returns the correlation header exactly once")
+    void returnsCorrelationHeaderExactlyOnce() {
+        // The filter sets this header on every response. ResponseEntity.header() appends
+        // rather than replaces, so setting it again in the exception handler emitted it
+        // twice — valid HTTP, but ambiguous for a client and plainly unintended.
+        MvcResult result;
+        try {
+            result = submit("err-single-header",
+                    "<Message><unclosed></Message>".getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            throw new IllegalStateException(e);
+        }
+
+        assertThat(result.getResponse().getHeaders(PaymentController.CORRELATION_ID_HEADER))
+                .hasSize(1);
     }
 
     @Test

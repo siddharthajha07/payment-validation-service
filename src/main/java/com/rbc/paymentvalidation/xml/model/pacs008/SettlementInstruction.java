@@ -5,8 +5,8 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * {@code SttlmInf} — how the payment settles between the agents. The samples use
- * {@code CLRG} (settlement through a clearing system) with a proprietary clearing
+ * SttlmInf — how the payment settles between the agents. The samples use
+ * CLRG (settlement through a clearing system) with a proprietary clearing
  * system identifier.
  */
 @XmlAccessorType(XmlAccessType.FIELD)

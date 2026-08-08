@@ -24,17 +24,12 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Writes the outcome of processing a message to the database.
  *
- * <h2>Two paths, deliberately asymmetric</h2>
- * Accepting a payment stores the payment and creates or refreshes the customers and
- * accounts it names. Rejecting one stores the payment for troubleshooting but touches no
- * customer data: a message that failed validation is not a trustworthy source of truth
- * about a customer, and learning from messages you have just declared invalid is the
- * easiest way to corrupt a customer store.
+ * The two paths are deliberately asymmetric: accepting stores the payment and refreshes the
+ * customers and accounts it names, rejecting stores the payment for troubleshooting but
+ * touches no customer data.
  *
- * <h2>Why the whole message is one transaction</h2>
- * A pacs.008 is a batch. Storing some of its transactions and not others would leave the
- * database describing a message that was never sent. The method is transactional so the
- * batch is recorded completely or not at all.
+ * A pacs.008 is a batch, so this is transactional. Storing some transactions and not others
+ * would leave the database describing a message nobody sent.
  */
 @Service
 public class PaymentRecordingService {
@@ -95,13 +90,13 @@ public class PaymentRecordingService {
     /**
      * Records a rejected message.
      *
-     * <p>The audit trail always records the rejection. The payment table records it only
+     * The audit trail always records the rejection. The payment table records it only
      * when the message carried enough identity to file it under — a message rejected for a
      * missing transaction identifier has no key to store it against, and one rejected as a
      * duplicate would collide with the payment already there. In both cases the audit event
      * is the record of the attempt, which is what the trail is for.
      *
-     * @return the stored payment, or {@code null} when only an audit event was written
+     * @return the stored payment, or null when only an audit event was written
      */
     @Transactional
     public Payment recordRejection(Pacs008Message message, ValidationError error,
@@ -138,7 +133,7 @@ public class PaymentRecordingService {
 
     /**
      * @return the first transaction carrying the minimum data needed to store a payment,
-     *         or {@code null} if none does
+     *         or null if none does
      */
     private CreditTransferTransaction firstStorableTransaction(Pacs008Message message) {
         if (message.getCreditTransfer() == null

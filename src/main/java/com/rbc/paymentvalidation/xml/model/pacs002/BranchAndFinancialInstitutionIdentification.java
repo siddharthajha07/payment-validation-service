@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 
-/** An agent referenced by the status report, such as {@code InstdAgt}. */
+/** An agent referenced by the status report, such as InstdAgt. */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"financialInstitutionIdentification"})
 public class BranchAndFinancialInstitutionIdentification {

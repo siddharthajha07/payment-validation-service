@@ -1,26 +1,14 @@
 package com.rbc.paymentvalidation.logging;
 
 /**
- * Reduces sensitive values to a form safe to write to a log or an audit trail.
+ * Reduces sensitive values to something safe for a log or the audit trail.
  *
- * <h2>What this service will not record</h2>
- * The specification is explicit: no sensitive customer information, and no full XML
- * payloads. This service treats that as an absolute rather than a default. Customer names
- * are never written anywhere outside the database column that holds them. Account numbers
- * appear only masked. Payloads are never logged in whole or in part — not even at debug
- * level, because debug logging is exactly what gets switched on during an incident, which
- * is the worst possible moment to start writing account numbers to disk.
+ * Names are never written outside the database column holding them, account numbers appear
+ * masked, and payloads are never logged at all, not even at debug level, since debug is what
+ * gets switched on during an incident.
  *
- * <h2>Why the last four digits, and not fewer or none</h2>
- * An operator investigating a payment needs to confirm they are looking at the right
- * account. Masking everything makes two rows indistinguishable and pushes them towards
- * querying the database directly, which is a worse outcome than a partial identifier. Four
- * trailing characters are the familiar convention on statements and receipts: enough to
- * recognise, far too little to reconstruct.
- *
- * <p>Short values are masked entirely. A four-character account revealed by "last four"
- * would not be masked at all, and a rule that silently stops protecting small inputs is a
- * rule nobody can rely on.
+ * Four trailing characters is the convention on statements: enough for an operator to confirm
+ * the right account, too little to reconstruct it. Short values are masked completely.
  */
 public final class MaskingUtil {
 

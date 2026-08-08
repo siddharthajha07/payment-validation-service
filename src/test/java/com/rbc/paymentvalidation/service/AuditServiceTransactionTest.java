@@ -15,12 +15,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 /**
  * Proves that audit events survive the rollback of the work they describe.
  *
- * <p>{@code AuditService} declares {@code REQUIRES_NEW}, but an annotation nobody exercises
+ * AuditService declares REQUIRES_NEW, but an annotation nobody exercises
  * is a claim, not a guarantee — and this one only takes effect through Spring's proxy, so
  * it cannot be verified by constructing the service directly. This test therefore uses the
  * real application context and a genuine rollback.
  *
- * <p>What is at stake: if audit events shared the caller's transaction, then whenever
+ * What is at stake: if audit events shared the caller's transaction, then whenever
  * processing failed the trail would lose all record that the attempt had ever been made.
  * A failed attempt is precisely what an auditor most wants to see.
  */

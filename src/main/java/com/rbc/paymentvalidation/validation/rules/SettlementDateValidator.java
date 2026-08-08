@@ -12,26 +12,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Checks that the interbank settlement date falls within an acceptable window.
+ * Checks the settlement date falls inside an acceptable window.
  *
- * <h2>Why a Clock is injected rather than calling LocalDate.now()</h2>
- * A rule about "today" is untestable if it asks the system for the time directly: the test
- * would have to construct dates relative to the real clock, and a test asserting that a
- * date is in the future stops being true once that date arrives. Injecting a
- * {@link Clock} lets a test fix the current date, so the assertions state exactly what
- * they mean and keep meaning it indefinitely.
+ * The Clock is injected rather than calling LocalDate.now() directly. A rule about today is
+ * untestable otherwise: a test asserting some date is in the future stops being true once that
+ * date arrives. With an injected clock a test can fix today and keep meaning what it says.
  *
- * <p>This is the single most valuable habit in date-sensitive code, and it costs one
- * constructor argument.
- *
- * <h2>Why a past date is rejected</h2>
- * Settlement cannot be backdated: the funds movement it describes would have to have
- * happened already. A past date means the sender has stale configuration or the message
- * has been sitting in a queue, and in both cases processing it as though it were current
- * would settle it on the wrong day.
- *
- * <p>The date is optional in ISO 20022. When it is absent there is nothing to check, and
- * the rule passes rather than inventing a requirement the standard does not make.
+ * A past date is rejected because settlement cannot be backdated. The date is optional in ISO,
+ * and when absent there is nothing to check.
  */
 @Component
 @Order(70)

@@ -5,14 +5,8 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * {@code CdtTrfTxInf} — one credit transfer transaction: who is paying whom, how much,
+ * CdtTrfTxInf — one credit transfer transaction: who is paying whom, how much,
  * through which agents.
- *
- * <p>The distinction between debtor and ultimate debtor matters and is preserved rather
- * than collapsed. {@code Dbtr} is the party whose account is debited; {@code UltmtDbtr}
- * is the party on whose behalf the payment is ultimately made. They are frequently the
- * same, but where they differ the ultimate parties carry the organisation identifier this
- * service uses as the customer reference.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CreditTransferTransaction {
@@ -29,7 +23,7 @@ public class CreditTransferTransaction {
     @XmlElement(name = "AccptncDtTm")
     private String acceptanceDateTime;
 
-    /** Charge bearer, for example {@code SLEV} (following the service level rules). */
+    /** Charge bearer, for example SLEV (following the service level rules). */
     @XmlElement(name = "ChrgBr")
     private String chargeBearer;
 

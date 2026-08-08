@@ -23,30 +23,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
- * Turns every unhandled failure into a controlled response.
+ * Turns unhandled failures into controlled responses.
  *
- * <h2>What belongs here and what does not</h2>
- * This handler deals with requests that could not become payments: a payload that will not
- * parse, a missing header, an unsupported content type, an internal fault. It does not
- * deal with business rejections. A message that was understood and then refused receives a
- * signed pacs.002 with an ISO reason code, decided in the service layer, and never reaches
- * this class.
+ * This handles requests that could not become payments: a payload that will not parse, a
+ * missing header, a wrong content type, an internal fault. Business rejections never reach
+ * here; they get a signed pacs.002 decided in the service layer. That split is why a rejection
+ * is not modelled as an exception.
  *
- * <p>The distinction is the reason a rejection is not modelled as an exception. Using
- * exceptions for expected outcomes would put the most important behaviour in the service —
- * telling a bank why its payment was refused — in an error handler, where it would be
- * indistinguishable from a genuine fault.
- *
- * <h2>Why no error returns a pacs.002</h2>
- * A status report must quote the identifiers of the message it reports on. In every case
- * handled here those identifiers were never successfully read, so a pacs.002 would have to
- * invent them.
- *
- * <h2>What is never disclosed</h2>
- * No stack trace, no exception type, no internal path reaches the caller. Those describe
- * how the service is built rather than what the caller did wrong, and they are exactly
- * what an attacker probes for. The full detail is logged against the correlation id, which
- * the caller does receive, so nothing is lost to whoever is entitled to see it.
+ * None of these return a pacs.002, because a status report has to quote identifiers that were
+ * never read. Nothing internal reaches the caller either: no stack trace, exception type or
+ * path. The detail is logged against the correlation id, which the caller does get.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -64,7 +50,7 @@ public class GlobalExceptionHandler {
     /**
      * A well-formed document that does not conform to the pacs.008 schema.
      *
-     * <p>Every violation found is returned, so a sender correcting the message learns
+     * Every violation found is returned, so a sender correcting the message learns
      * everything that is wrong in one exchange. Schema violations name elements and
      * constraints, never element content, so they are safe to disclose.
      */
@@ -121,7 +107,7 @@ public class GlobalExceptionHandler {
     /**
      * A database constraint refused the write.
      *
-     * <p>In practice this is the concurrent-creation race: two requests naming the same
+     * In practice this is the concurrent-creation race: two requests naming the same
      * previously unknown customer, or carrying the same transaction, both reaching the
      * database at once. The constraint is doing its job. A retry under the same idempotency
      * key is safe and will succeed, which is what the caller is told.
@@ -147,7 +133,7 @@ public class GlobalExceptionHandler {
     /**
      * Anything not anticipated.
      *
-     * <p>Logged in full, including the stack trace, because an operator needs it. Reported
+     * Logged in full, including the stack trace, because an operator needs it. Reported
      * to the caller as nothing but a correlation id, because they do not.
      */
     @ExceptionHandler(Exception.class)
@@ -162,17 +148,13 @@ public class GlobalExceptionHandler {
         ErrorResponse body = new ErrorResponse(code, message, CorrelationId.current(),
                 DateTimeFormatter.ISO_INSTANT.format(Instant.now(clock)), details);
 
+        // The correlation header is deliberately not set here. CorrelationIdFilter has
+        // already placed it on the response, and ResponseEntity.header() appends rather
+        // than replaces — so setting it again emitted the header twice, which is ambiguous
+        // for a client parsing the response. It appears in the body instead, where the
+        // caller can quote it back.
         return ResponseEntity.status(status)
                 .contentType(MediaType.APPLICATION_XML)
-                .header(CorrelationIdHeaders.CORRELATION_ID, CorrelationId.current())
                 .body(errorResponseWriter.write(body));
-    }
-
-    /** Header names shared with the controller. */
-    static final class CorrelationIdHeaders {
-        static final String CORRELATION_ID = "X-Correlation-Id";
-
-        private CorrelationIdHeaders() {
-        }
     }
 }

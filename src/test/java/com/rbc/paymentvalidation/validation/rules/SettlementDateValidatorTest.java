@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests for the settlement date window.
  *
- * <p>Every test here runs against a clock fixed at 2026-07-30. Written against the real
+ * Every test here runs against a clock fixed at 2026-07-30. Written against the real
  * clock, a test asserting that 2026-07-31 is acceptable would pass today and fail once
  * that date has gone by — a test that expires is worse than no test, because it fails long
  * after the change that supposedly broke it.

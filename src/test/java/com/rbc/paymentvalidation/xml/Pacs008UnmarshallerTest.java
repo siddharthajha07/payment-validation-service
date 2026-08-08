@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that the supplied sample binds correctly to the JAXB model.
  *
- * <p>These assertions guard against the failure mode that matters most in namespaced XML:
- * a mismatched namespace does not raise an error, it silently yields {@code null}. Reading
+ * These assertions guard against the failure mode that matters most in namespaced XML:
+ * a mismatched namespace does not raise an error, it silently yields null. Reading
  * concrete values back out of every part of the message is the only way to prove the
  * binding is actually correct rather than merely quiet.
  */

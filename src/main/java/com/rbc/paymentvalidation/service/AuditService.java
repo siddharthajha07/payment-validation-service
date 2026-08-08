@@ -13,26 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Records what happened to a request on the append-only audit trail.
  *
- * <h2>Why every event commits in its own transaction</h2>
- * {@code REQUIRES_NEW} suspends whatever transaction is in progress and commits the audit
- * event separately. That is deliberate, and it is the most important decision in this
- * class.
- *
- * <p>Sharing the caller's transaction would mean that when the business transaction rolls
- * back — a constraint violation, an unexpected fault — the audit events roll back with it.
- * The trail would then have no record that the attempt was ever made, and a failed attempt
- * is exactly what an auditor or an operator most needs to see. An audit trail that
- * remembers only successes is not an audit trail.
- *
- * <p>The cost is a separate transaction per event. For a service handling a handful of
- * events per request that is a negligible price for a trail that cannot be erased by the
- * failure it is recording.
- *
- * <h2>What may go in the detail</h2>
- * The detail describes the decision, never the data behind it: which rule rejected the
- * message, not the customer's name, the account number, or any part of the payload. The
- * specification's instruction not to log sensitive customer information applies to the
- * audit trail as much as to the logs.
+ * Every event commits in its own transaction. If they shared the caller's, a rollback would
+ * erase the record that the attempt was ever made, and a failed attempt is exactly what an
+ * auditor wants to see.
  */
 @Service
 public class AuditService {
@@ -60,7 +43,7 @@ public class AuditService {
     /**
      * Records an event against a stored payment.
      *
-     * @param paymentId the payment this event concerns, or {@code null} if none exists yet
+     * @param paymentId the payment this event concerns, or null if none exists yet
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void record(String correlationId, AuditEventType eventType, Long paymentId,

@@ -6,13 +6,7 @@ import jakarta.xml.bind.annotation.XmlElement;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * {@code OrgId} — identification of an organisation.
- *
- * <p>{@code Othr} is modelled as a list because ISO 20022 permits repetition, even though
- * the supplied samples carry a single occurrence. Modelling it as a single value would
- * silently discard identifiers in a message that is perfectly valid.
- */
+/** OrgId — identification of an organisation. */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class OrganisationIdentification {
 

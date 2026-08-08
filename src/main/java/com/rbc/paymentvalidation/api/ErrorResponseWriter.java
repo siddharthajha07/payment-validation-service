@@ -8,14 +8,12 @@ import java.io.StringWriter;
 import org.springframework.stereotype.Component;
 
 /**
- * Serialises an {@link ErrorResponse} to XML.
+ * Serialises an ErrorResponse to XML.
  *
- * <h2>Why this exists rather than building the XML by hand</h2>
- * String concatenation would be shorter and would be a defect waiting to happen. Error
- * documents quote values that came from the caller, and a value containing {@code <} or
- * {@code &} would either produce malformed XML or, worse, allow the caller to inject
- * elements into a document the receiving system trusts. A marshaller escapes content as a
- * matter of course; a template does so only when its author remembers to.
+ * String concatenation would be shorter and would be a bug waiting to happen. Error documents
+ * quote values the caller supplied, and one containing < or & would either produce malformed
+ * XML or let the caller inject elements into a document the receiver trusts. A marshaller
+ * escapes as a matter of course.
  */
 @Component
 public class ErrorResponseWriter {

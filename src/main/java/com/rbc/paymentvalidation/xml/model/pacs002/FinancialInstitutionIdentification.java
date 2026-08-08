@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlType;
 
-/** {@code FinInstnId} — identifies a financial institution by its BIC. */
+/** FinInstnId — identifies a financial institution by its BIC. */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(propOrder = {"bicfi"})
 public class FinancialInstitutionIdentification {

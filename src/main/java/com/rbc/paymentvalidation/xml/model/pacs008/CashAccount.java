@@ -4,9 +4,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
-/**
- * {@code DbtrAcct} / {@code CdtrAcct} — the debtor's or creditor's account.
- */
+/** DbtrAcct / CdtrAcct — the debtor's or creditor's account. */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class CashAccount {
 
@@ -23,7 +21,7 @@ public class CashAccount {
 
     /**
      * @return the account number, preferring the IBAN when present and falling back to
-     *         the generic {@code Othr} identifier, or {@code null} if neither is present.
+     *         the generic Othr identifier, or null if neither is present.
      */
     public String accountNumber() {
         if (identification == null) {

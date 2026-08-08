@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * {@code Othr} within {@code OrgId} — an organisation identifier issued by a private
+ * Othr within OrgId — an organisation identifier issued by a private
  * scheme. In the supplied samples this carries the customer reference that this service
  * uses as the natural key for a customer record.
  */

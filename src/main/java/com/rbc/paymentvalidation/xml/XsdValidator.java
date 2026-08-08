@@ -23,25 +23,13 @@ import org.xml.sax.SAXParseException;
 /**
  * Validates a parsed document against the inbound message schema.
  *
- * <h2>Where schema validation sits</h2>
- * Schema validation answers a structural question — are the required elements present,
- * in the right order, with values in the right lexical form. It deliberately does not
- * answer business questions such as whether the amount is positive or the currency is
- * supported. Those are enforced later by the validator chain, so that a message which is
- * understood but unacceptable receives a signed pacs.002 rejection carrying an ISO reason
- * code, while a message that cannot be understood receives a plain HTTP 400.
+ * The schema answers a structural question only. Whether the amount is positive or the currency
+ * is supported is a business question, answered later, so an understood-but-unacceptable
+ * message gets a signed pacs.002 rather than a bare 400.
  *
- * <h2>How external access is prevented</h2>
- * The three schema documents are read from the classpath at startup and compiled into a
- * single {@link Schema}. The envelope schema imports the other two by namespace only,
- * with no {@code schemaLocation} hint, so nothing is ever fetched: external DTD and
- * schema access are both set to the empty string, which forbids every protocol. An
- * attacker-supplied {@code schemaLocation} in a payload therefore has nothing to act on.
- *
- * <h2>Thread safety</h2>
- * A compiled {@link Schema} is immutable and safe to share, so it is built once. A
- * {@link Validator} is not, so a fresh one is obtained per call — cheap, since it reuses
- * the already-compiled schema.
+ * The three schemas are compiled together at startup and the envelope imports the other two by
+ * namespace with no schemaLocation, so nothing is ever fetched. A compiled Schema is shared; a
+ * Validator is not, so one is made per call.
  */
 @Component
 public class XsdValidator {
@@ -63,10 +51,6 @@ public class XsdValidator {
         this.schema = compileSchema();
     }
 
-    /**
-     * @param document a parsed inbound message
-     * @throws SchemaValidationException listing every violation found, if any
-     */
     public void validate(Document document) {
         CollectingErrorHandler errorHandler = new CollectingErrorHandler();
         try {

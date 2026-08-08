@@ -1,18 +1,10 @@
 package com.rbc.paymentvalidation.service;
 
 /**
- * What the service decided about a request, and what to send back.
+ * What the service decided, and what to send back.
  *
- * <p>The HTTP status travels alongside the response body rather than being derived from it
- * by the controller. The two are decided together — an acceptance is a 200 with an
- * {@code ACCP} report, a rejection a 422 with a signed {@code RJCT} report — and keeping
- * them together means the controller does not have to re-derive the outcome by inspecting
- * XML it has just been handed.
- *
- * @param httpStatus    the status to return
- * @param responseXml   the signed status report
- * @param replay        whether this response was replayed from a previous identical request
- * @param transactionId the transaction the response concerns, or {@code null}
+ * The status travels with the body rather than being derived from it, because the two are
+ * decided together and the controller should not have to re-read XML it was just handed.
  */
 public record ProcessingOutcome(int httpStatus, String responseXml, boolean replay,
                                 String transactionId) {

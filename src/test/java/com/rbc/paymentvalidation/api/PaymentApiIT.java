@@ -28,10 +28,10 @@ import org.springframework.test.web.servlet.MvcResult;
 /**
  * End-to-end tests through the HTTP endpoint against the real application.
  *
- * <p>Named {@code *IT} so it runs under Failsafe, after packaging, rather than in the fast
+ * Named *IT so it runs under Failsafe, after packaging, rather than in the fast
  * unit-test cycle.
  *
- * <p>The clock is replaced with a fixed one. The supplied sample settles on 2026-07-31, so
+ * The clock is replaced with a fixed one. The supplied sample settles on 2026-07-31, so
  * a test against the real clock would pass only until that date passed and then start
  * failing for a reason unrelated to any change in the code.
  */
@@ -52,8 +52,8 @@ class PaymentApiIT {
     /**
      * Injected rather than built from the context.
      *
-     * <p>{@code MockMvcBuilders.webAppContextSetup(...).build()} wires the dispatcher but
-     * <em>not</em> the servlet filters, so {@code CorrelationIdFilter} would never run and
+     * MockMvcBuilders.webAppContextSetup(...).build() wires the dispatcher but
+     * not the servlet filters, so CorrelationIdFilter would never run and
      * every response would lack its correlation header — a failure of the test setup that
      * looks exactly like a failure of the application.
      */
@@ -78,7 +78,7 @@ class PaymentApiIT {
     /**
      * The conformant message carrying a transaction identifier unique to one test.
      *
-     * <p>{@code @SpringBootTest} shares one application context and one database across the
+     * @SpringBootTest shares one application context and one database across the
      * whole class, and nothing is rolled back between tests. Since the service is designed
      * to reject a transaction identifier it has already processed — including one stored by
      * a rejection — every test must submit its own, exactly as every real payment carries

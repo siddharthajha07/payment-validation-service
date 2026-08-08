@@ -5,7 +5,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * {@code PmtTpInf} — how the payment should be handled: its service level, local
+ * PmtTpInf — how the payment should be handled: its service level, local
  * instrument and category purpose.
  */
 @XmlAccessorType(XmlAccessType.FIELD)

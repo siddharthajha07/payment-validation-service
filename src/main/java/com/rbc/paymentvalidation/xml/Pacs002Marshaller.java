@@ -23,17 +23,9 @@ import org.w3c.dom.Document;
 /**
  * Turns a status report into XML.
  *
- * <h2>Why the report is marshalled into a DOM rather than straight to text</h2>
- * The signature has to be inserted into the document and computed over its canonical form,
- * which requires a document object to work with. Marshalling to text and reparsing would
- * work but would parse the same content twice for no benefit.
- *
- * <h2>Why the output is never indented</h2>
- * {@link #toXml(Document)} deliberately does not set {@code OutputKeys.INDENT}. A signature
- * covers the exact bytes of the canonicalised document; adding whitespace afterwards
- * changes those bytes and the signature stops verifying, while the XML still looks
- * perfectly correct to a human reader. Pretty-printing a signed document is the single
- * most common way to break one.
+ * Marshalling produces a DOM because the signature has to be inserted into the document and
+ * computed over its canonical form. toXml deliberately does not indent: a signature covers
+ * exact bytes, so adding whitespace afterwards breaks it while leaving the XML looking fine.
  */
 @Component
 public class Pacs002Marshaller {
@@ -54,10 +46,6 @@ public class Pacs002Marshaller {
         }
     }
 
-    /**
-     * @param message the status report to write
-     * @return the report as a DOM document, ready to be signed
-     */
     public Document toDocument(Pacs002Message message) {
         try {
             Document document = newDocument();
@@ -70,10 +58,6 @@ public class Pacs002Marshaller {
         }
     }
 
-    /**
-     * @param document a document, usually already signed
-     * @return its exact serialised form, with no reformatting applied
-     */
     public String toXml(Document document) {
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -106,7 +90,7 @@ public class Pacs002Marshaller {
     /**
      * Asks the marshaller to emit the prefixes used in the supplied samples.
      *
-     * <p>Purely cosmetic — prefixes are arbitrary labels and a receiver matches on the
+     * Purely cosmetic — prefixes are arbitrary labels and a receiver matches on the
      * namespace URI — but output that resembles the samples is easier to compare against
      * them by eye. The property is specific to the JAXB reference implementation, so an
      * unsupported property is ignored rather than allowed to fail a response.

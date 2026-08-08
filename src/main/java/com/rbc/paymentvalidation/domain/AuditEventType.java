@@ -3,11 +3,9 @@ package com.rbc.paymentvalidation.domain;
 /**
  * The kinds of event recorded on the audit trail.
  *
- * <p>The set is deliberately built around the questions an operator or auditor actually
- * asks after the fact: did the message arrive, was it understood, why was it rejected,
- * what did it change about our customer records, and what did we send back. Every event
- * carries the correlation id of the request that produced it, so the complete history of
- * one request can be retrieved with a single query.
+ * Built around the questions someone actually asks afterwards: did the message arrive, was it
+ * understood, why was it rejected, what did it change about our customer records, and what did
+ * we send back. Every event carries the correlation id of the request that produced it.
  */
 public enum AuditEventType {
 

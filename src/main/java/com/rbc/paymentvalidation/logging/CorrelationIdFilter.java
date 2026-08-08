@@ -11,22 +11,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Establishes a correlation identifier for every request, before anything else runs.
+ * Establishes a correlation id for every request, before anything else runs.
  *
- * <h2>Why a filter rather than the controller</h2>
- * A filter wraps the entire request, including the parts of it that never reach a
- * controller: a malformed body rejected by the framework, an unsupported content type, an
- * exception thrown before dispatch. Those are exactly the requests somebody will later ask
- * about, so they are the ones that most need to be traceable. Setting the identifier in the
- * controller would leave them anonymous.
+ * A filter rather than the controller, because it wraps the requests that never reach a
+ * controller: a malformed body, a wrong content type, an exception before dispatch. Those are
+ * the ones somebody asks about later, so they are the ones that most need to be traceable.
  *
- * <p>{@code HIGHEST_PRECEDENCE} places it first in the chain, so no other filter logs
- * anything before the identifier exists.
- *
- * <h2>Why the identifier is echoed back</h2>
- * A caller reporting a problem can quote the header from the response they received, and
- * that single value locates every log line, payment row and audit event belonging to the
- * request. Without it, investigating a complaint means searching by timestamp and hoping.
+ * The id is echoed back so a caller reporting a problem can quote it. Clearing it in the
+ * finally block is not tidiness: servlet threads are pooled, and an id left behind would
+ * attach to the next unrelated request, which is worse than having none.
  */
 @Component
 @Order(Ordered.HIGHEST_PRECEDENCE)

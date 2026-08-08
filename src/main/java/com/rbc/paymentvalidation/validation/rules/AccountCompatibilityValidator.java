@@ -17,28 +17,21 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Enforces that an account number is consistent with the institution holding it, and that
- * branch transit identifiers have the expected form.
+ * Checks that an account number fits the institution holding it, and that transit numbers look
+ * right.
  *
- * <h2>Where the prefix comes from</h2>
- * The assessment states that institution A uses FI-prefixed account numbers and
- * institution B uses RI-prefixed ones. That knowledge lives in the {@code institution}
- * table, not in this class: the rule looks the agent up and asks it what prefix it uses.
- * Onboarding a third institution is therefore an insert, not a change to this file.
+ * The brief says institution A uses FI-prefixed accounts and B uses RI. That knowledge lives
+ * in the institution table, not here: this rule looks the agent up and asks. Onboarding a
+ * third institution is an insert. An institution with no prefix holds no customer accounts and
+ * the check does not apply to it.
  *
- * <p>An institution with no prefix — the clearing system in the supplied samples — holds no
- * customer accounts, and the prefix check simply does not apply to it.
+ * The transit rule is worth naming. The brief requires three digits; the supplied sample
+ * carries 05605, five digits, so the sample fails this rule as written. Implemented as
+ * specified rather than bent to fit, with the length in configuration and the conflict in
+ * ASSUMPTIONS.md.
  *
- * <h2>The transit number, and a conflict worth naming</h2>
- * The assessment requires a three-digit transit number. The supplied sample carries
- * {@code 05605}, which is five digits, so the sample fails this rule as specified. The rule
- * is implemented as written rather than bent to fit the sample, the length is held in
- * configuration so it can be corrected without a code change, and the conflict is recorded
- * in ASSUMPTIONS.md.
- *
- * <h2>Debtor and creditor accounts must differ</h2>
- * A credit transfer moves money between two accounts. One naming the same account on both
- * sides moves nothing and is a client defect.
+ * Debtor and creditor accounts must also differ, since a transfer naming one account on both
+ * sides moves nothing.
  */
 @Component
 @Order(40)

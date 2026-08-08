@@ -16,31 +16,18 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
- * Parses an inbound payload into a DOM document with external entity processing disabled.
+ * Parses an inbound payload into a DOM with external entity resolution turned off.
  *
- * <h2>The attack being prevented</h2>
- * XML permits a document to declare entities that expand into other content, including
- * the contents of a local file or a URL:
- * <pre>{@code
- * <!DOCTYPE foo [ <!ENTITY xxe SYSTEM "file:///etc/passwd"> ]>
- * <foo>&xxe;</foo>
- * }</pre>
- * A default-configured parser resolves that entity, disclosing the file to whoever can
- * see the response or the error. Aimed at an internal URL instead, the same technique
- * lets an external caller probe systems behind the firewall. A related attack nests
- * entities so that they expand exponentially, exhausting memory — the "billion laughs".
+ * XML lets a document declare entities that expand into other content, including a local
+ * file or a URL. A default parser resolves them, which leaks files to whoever sees the
+ * response and lets an outside caller reach hosts behind the firewall. A related trick
+ * nests entities so they expand exponentially and exhaust memory.
  *
- * <h2>The defence</h2>
- * Both attacks require a {@code <!DOCTYPE>} declaration, so refusing to accept one at all
- * defeats both outright. That single feature does most of the work here; the remaining
- * settings are defence in depth in case the parser implementation is ever swapped for one
- * that treats the first feature differently.
+ * Both need a DOCTYPE declaration, so refusing one outright defeats both. The remaining
+ * settings are belt and braces in case the parser implementation is ever swapped.
  *
- * <h2>Why the factory is built per call</h2>
- * A Spring {@code @Component} is a singleton shared by every request thread, and
- * {@link DocumentBuilderFactory} is not thread-safe. Building a configured factory inside
- * the parse call keeps the hardening free of shared mutable state; the cost is negligible
- * beside parsing itself, and it removes a whole class of concurrency bug.
+ * The factory is rebuilt per call because this bean is a singleton shared by request
+ * threads and DocumentBuilderFactory is not thread-safe.
  */
 @Component
 public class SecureXmlParser {
@@ -62,12 +49,7 @@ public class SecureXmlParser {
         this.maxPayloadBytes = maxPayloadBytes;
     }
 
-    /**
-     * @param payload the raw request body
-     * @return the parsed, namespace-aware DOM document
-     * @throws XmlProcessingException if the payload is empty, oversized, not well formed,
-     *                                or contains a document type declaration
-     */
+    /** Throws XmlProcessingException if the payload is empty, oversized, malformed or has a DOCTYPE. */
     public Document parse(byte[] payload) {
         if (payload == null || payload.length == 0) {
             throw new XmlProcessingException("Request body is empty");
@@ -82,18 +64,14 @@ public class SecureXmlParser {
         try {
             DocumentBuilder builder = hardenedFactory().newDocumentBuilder();
             builder.setErrorHandler(new FailFastErrorHandler());
-            // The parsed document is returned exactly as it was read. In particular it is
-            // NOT normalised: Document.normalizeDocument() merges text nodes and performs
-            // namespace fixup, both of which change the canonical byte form of the
-            // document. A digital signature is computed over exactly those bytes, so
-            // normalising a signed message silently makes its signature stop verifying
-            // while leaving the XML looking entirely correct.
+            // Returned exactly as read. Deliberately not normalised: normalizeDocument()
+            // merges text nodes and rewrites namespaces, which changes the canonical bytes
+            // a signature was computed over and silently breaks verification.
             return builder.parse(new ByteArrayInputStream(payload));
         } catch (ParserConfigurationException e) {
             throw new XmlProcessingException("XML parser could not be configured securely", e);
         } catch (SAXException | IOException e) {
-            // The payload itself is never logged: it carries customer names and account
-            // numbers. Size and the parser's own message are enough to diagnose a fault.
+            // Never log the payload itself; it carries names and account numbers.
             log.warn("Rejected malformed XML payload of {} bytes: {}",
                     payload.length, e.getMessage());
             throw new XmlProcessingException("Request body is not well-formed XML", e);
@@ -103,11 +81,10 @@ public class SecureXmlParser {
     private DocumentBuilderFactory hardenedFactory() throws ParserConfigurationException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
-        // The decisive control: no DOCTYPE means no entity declarations, which defeats
-        // both external-entity disclosure and exponential entity expansion.
+        // The one that matters: no DOCTYPE means no entity declarations at all.
         factory.setFeature(DISALLOW_DOCTYPE, true);
 
-        // Defence in depth, should the feature above ever be unsupported or bypassed.
+        // Belt and braces if the above is ever unsupported.
         factory.setFeature(EXTERNAL_GENERAL_ENTITIES, false);
         factory.setFeature(EXTERNAL_PARAMETER_ENTITIES, false);
         factory.setFeature(LOAD_EXTERNAL_DTD, false);
@@ -117,18 +94,14 @@ public class SecureXmlParser {
         factory.setXIncludeAware(false);
         factory.setExpandEntityReferences(false);
 
-        // Essential, and easy to overlook: without this the parser ignores namespaces and
-        // every ISO element would be matched by local name alone, conflating the
-        // identically named elements that appear in the header and the document.
+        // Easy to overlook. Without it the parser matches on local name alone, so BICFI in
+        // the header and BICFI in the document become the same element.
         factory.setNamespaceAware(true);
 
         return factory;
     }
 
-    /**
-     * Turns recoverable parse errors into failures. The default handler prints warnings
-     * and carries on, which would let a subtly malformed document through.
-     */
+    /** The default handler prints warnings and carries on, which would let bad XML through. */
     private static final class FailFastErrorHandler implements ErrorHandler {
 
         @Override

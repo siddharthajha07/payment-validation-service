@@ -12,18 +12,13 @@ import java.time.Instant;
 /**
  * A customer, created or updated from the parties named on an incoming payment.
  *
- * <h2>The natural key</h2>
- * {@code customerReference} is the organisation identifier carried at
- * {@code Id/OrgId/Othr/Id} on the ultimate debtor or creditor. It is the only stable
- * identifier the message offers: names are free text and change spelling between
- * messages, so matching on name would create duplicates and merge unrelated parties.
- * A unique constraint on the reference is what makes "create or update" safe.
+ * The key is the organisation identifier from Id/OrgId/Othr/Id, the only stable identifier the
+ * message offers. Names are free text and change spelling between messages, so matching on
+ * name would create duplicates and merge unrelated parties.
  *
- * <h2>Why there is a version column</h2>
- * Two payments naming the same customer can be processed concurrently. Without optimistic
- * locking, both would read the same row, both would apply their changes, and the second
- * write would silently discard the first. {@code @Version} makes the second write fail
- * loudly instead, so it can be retried against the current state.
+ * The version column matters because two payments naming the same customer can be processed at
+ * once. Without optimistic locking both would read the same row, both would write, and the
+ * second would silently discard the first.
  */
 @Entity
 @Table(name = "customer")

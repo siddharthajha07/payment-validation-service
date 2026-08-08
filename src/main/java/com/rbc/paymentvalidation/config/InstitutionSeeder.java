@@ -11,24 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * Loads the participating institutions at startup.
+ * Loads the participating institutions at startup, inserting only what is missing.
  *
- * <h2>Why a seeder rather than data.sql</h2>
- * Spring Boot runs {@code data.sql} before Hibernate creates the schema unless
- * {@code defer-datasource-initialization} is set, which is a well-known trap that fails
- * with a confusing "table not found". Seeding from a runner removes the ordering question
- * entirely, and the code is testable and debuggable in a way a SQL script is not.
- *
- * <h2>Why it is idempotent</h2>
- * Each institution is inserted only if its BIC is absent. The service can therefore be
- * restarted against a persistent database without duplicating reference data or failing
- * on a unique constraint.
- *
- * <h2>Production note</h2>
- * A real deployment would source this from the scheme's participant registry rather than
- * a constant in the code — institutions join, leave and are suspended, and none of that
- * should require a release. The list is inlined here because the assessment defines a
- * fixed pair of institutions and an embedded database.
+ * A runner rather than data.sql, which Spring Boot runs before Hibernate creates the schema
+ * unless defer-datasource-initialization is set. A real deployment would read the scheme's
+ * participant registry instead, since institutions join and leave without a release.
  */
 @Component
 public class InstitutionSeeder implements ApplicationRunner {
@@ -38,7 +25,7 @@ public class InstitutionSeeder implements ApplicationRunner {
     /**
      * Seed data as immutable values rather than entities.
      *
-     * <p>This distinction matters. Holding {@code Institution} instances in a static field
+     * This distinction matters. Holding Institution instances in a static field
      * would share mutable persistent state across the whole JVM: on the first save
      * Hibernate writes the generated identifier back into the shared object, so the next
      * save sees an entity that already has an identifier and issues an update against a
@@ -51,7 +38,7 @@ public class InstitutionSeeder implements ApplicationRunner {
     /**
      * The institutions this service recognises.
      *
-     * <p>The clearing system carries no account prefix: it is a valid counterparty on the
+     * The clearing system carries no account prefix: it is a valid counterparty on the
      * business header but never a debtor or creditor agent, so the account compatibility
      * rule does not apply to it.
      */

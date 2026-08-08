@@ -1,14 +1,6 @@
 package com.rbc.paymentvalidation.xml.model;
 
-/**
- * XML namespace URIs for the message types this service handles.
- *
- * <p>Namespace prefixes in an XML document ({@code env:}, {@code hdr:}, {@code dsig:})
- * are arbitrary local labels; only the URI they are bound to carries meaning. Two
- * elements with the same local name in different namespaces — for example {@code BICFI}
- * in the business header and {@code BICFI} in the pacs.008 document — are unrelated
- * elements. All matching in this service is therefore done on the URI, never the prefix.
- */
+/** XML namespace URIs for the message types this service handles. */
 public final class IsoNamespaces {
 
     /** Montran envelope that wraps the business header and the ISO document. */

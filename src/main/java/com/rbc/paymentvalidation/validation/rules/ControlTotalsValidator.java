@@ -14,21 +14,14 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * Checks the group header's control totals against what the message actually contains.
+ * Checks the group header's stated totals against what the message actually contains.
  *
- * <h2>What control totals are for</h2>
- * The sender states, in the group header, how many transactions the message contains and
- * what they add up to. Checking those claims against the transactions themselves detects
- * truncation in transit, a batching defect at the sender, and tampering — all of which
- * would otherwise be processed as though the surviving transactions were the whole message.
- * The cost of the check is one loop; the cost of not making it is settling a batch that
- * was never complete.
+ * The sender says how many transactions there are and what they add up to. Checking those
+ * claims catches truncation in transit, a batching fault at the sender, and tampering. The
+ * cost is one loop; the cost of skipping it is settling a batch that was never complete.
  *
- * <h2>Why the comparison uses compareTo</h2>
- * {@code BigDecimal.equals} compares scale as well as value, so {@code 1.02} and
- * {@code 1.020} are not equal by that method even though they are the same amount.
- * {@code compareTo} compares numeric value alone, which is what "the total matches" means.
- * Using {@code equals} here would reject valid messages over a trailing zero.
+ * The amount comparison uses compareTo rather than equals, because equals compares scale too
+ * and would reject a perfectly valid message over a trailing zero.
  */
 @Component
 @Order(60)

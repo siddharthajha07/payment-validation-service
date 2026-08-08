@@ -5,13 +5,8 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 
 /**
- * A party to the payment — {@code Dbtr}, {@code Cdtr}, {@code UltmtDbtr} or
- * {@code UltmtCdtr}.
- *
- * <p>{@link #customerReference()} flattens {@code Id/OrgId/Othr[0]/Id}, which is the
- * identifier this service treats as the natural key when creating or updating a customer
- * record. It returns {@code null} rather than throwing when any level is missing, because
- * a party without an identifier is a valid message that simply yields no customer record.
+ * A party to the payment — Dbtr, Cdtr, UltmtDbtr or
+ * UltmtCdtr.
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 public class PartyIdentification {
@@ -38,7 +33,7 @@ public class PartyIdentification {
         this.identification = identification;
     }
 
-    /** @return the first organisation identifier for this party, or {@code null}. */
+    /** @return the first organisation identifier for this party, or null. */
     public String customerReference() {
         if (identification == null
                 || identification.getOrganisationIdentification() == null
