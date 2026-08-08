@@ -19,7 +19,11 @@ set -euo pipefail
 URL="${PAYMENT_SERVICE_URL:-http://localhost:8080/api/v1/payments}"
 SAMPLE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/src/test/resources/samples"
 SAMPLE="${SAMPLE_DIR}/pacs008-valid.xml"
-TODAY="$(date +%Y-%m-%d)"
+# UTC, not local. The service compares against Clock.systemUTC(), because a settlement date
+# is a scheme date and should not depend on the timezone of the machine running the service.
+# Stamping a local date west of Greenwich in the evening produces yesterday's date in UTC,
+# which is then correctly rejected as backdated.
+TODAY="$(date -u +%Y-%m-%d)"
 REQUEST="$(mktemp)"
 trap 'rm -f "${REQUEST}"' EXIT
 

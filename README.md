@@ -70,14 +70,9 @@ script stamps today's date before posting. The same reasoning is in
 By hand, if you prefer:
 
 ```bash
-sed "s|<IntrBkSttlmDt>2026-07-31</IntrBkSttlmDt>|<IntrBkSttlmDt>$(date +%Y-%m-%d)</IntrBkSttlmDt>|" \
-  src/test/resources/samples/pacs008-valid.xml > /tmp/payment.xml
+sed "s|<IntrBkSttlmDt>2026-07-31</IntrBkSttlmDt>|<IntrBkSttlmDt>$(date -u +%Y-%m-%d)</IntrBkSttlmDt>|" src/test/resources/samples/pacs008-valid.xml > /tmp/payment.xml
 
-curl -i -X POST http://localhost:8080/api/v1/payments \
-  -H 'Content-Type: application/xml' \
-  -H 'X-Idempotency-Key: my-first-payment' \
-  -H 'X-Sender-Institution: BANKA000' \
-  --data-binary @/tmp/payment.xml
+curl -i -X POST http://localhost:8080/api/v1/payments -H 'Content-Type: application/xml' -H 'X-Idempotency-Key: my-first-payment' -H 'X-Sender-Institution: BANKA000' --data-binary @/tmp/payment.xml
 ```
 
 ## API
@@ -222,7 +217,11 @@ git log --graph --oneline --all
 ## Troubleshooting
 
 **A 422 with `DT01` when posting the sample by hand.** The sample's settlement date is in the
-past. Use `scripts/submit-sample.sh`, or stamp today's date as shown above.
+past. Use `scripts/submit-sample.sh`, or stamp the date as shown above — note that must be
+the **UTC** date (`date -u`), not the local one. The service compares against
+`Clock.systemUTC()`, since a settlement date is a scheme date rather than a property of
+whichever machine is running the service. West of Greenwich in the evening the local date is
+already yesterday in UTC, and a payment dated yesterday is correctly refused as backdated.
 
 **A 422 with `AM05` on a second run.** Duplicate detection is working: the transaction id has
 already been processed. The script generates a fresh one each run.
